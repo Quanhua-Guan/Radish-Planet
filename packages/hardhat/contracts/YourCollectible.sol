@@ -21,8 +21,9 @@ contract YourCollectible is ERC721Enumerable, Ownable {
 
     constructor() ERC721("Radish Planet", "RDH") {}
 
+    mapping(uint256 => uint256) public birth;
     mapping(uint256 => bytes3) public color;
-    mapping(uint256 => uint256) public mouthWidth;
+    mapping(uint256 => uint256) public shape;
 
     uint256 mintDeadline = block.timestamp + 3650 days;
 
@@ -42,13 +43,13 @@ contract YourCollectible is ERC721Enumerable, Ownable {
                 id
             )
         );
+
         color[id] =
             bytes2(predictableRandom[0]) |
             (bytes2(predictableRandom[1]) >> 8) |
             (bytes3(predictableRandom[2]) >> 16);
-        mouthWidth[id] =
-            9 +
-            ((50 * uint256(uint8(predictableRandom[3]))) / 255);
+        shape[id] = uint256(predictableRandom);
+        birth[id] = block.timestamp;
 
         return id;
     }
@@ -63,8 +64,8 @@ contract YourCollectible is ERC721Enumerable, Ownable {
             abi.encodePacked(
                 "This Radish borns with genes of color #",
                 color[id].toColor(),
-                " and size ",
-                mouthWidth[id].toString(),
+                // " and size ",
+                // shape[id].toString(),
                 "!!!"
             )
         );
@@ -135,7 +136,7 @@ contract YourCollectible is ERC721Enumerable, Ownable {
     {
         string memory svg = string(
             abi.encodePacked(
-                '<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink">',
+                '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink">',
                 renderTokenById(id),
                 "</svg>"
             )
@@ -168,7 +169,7 @@ contract YourCollectible is ERC721Enumerable, Ownable {
         rightEyeColor;
         noseColor;
         mouthColor;
-        mouthSize = mouthWidth[id];
+        mouthSize = shape[id];
         earSize = 20 + mouthSize / 2;
         noseSize = 17 + mouthSize / 8;
         unchecked {
@@ -183,27 +184,177 @@ contract YourCollectible is ERC721Enumerable, Ownable {
 
     // Visibility is `public` to enable it being called by other contracts for composition.
     function renderTokenById(uint256 id) public view returns (string memory) {
-        (
-            string memory leftEarColor,
-            string memory rightEarColor,
-            string memory faceStrokeColor,
-            string memory leftEyeColor,
-            string memory rightEyeColor,
-            string memory noseColor,
-            string memory mouthColor,
-            uint256 mouthSize,
-            uint256 earSize,
-            uint256 noseSize
-        ) = getPropertiesById(id);
-
         string memory render = string(
-            abi.encodePacked(                
-                '<circle cx="150" cy="150" r="97" stroke="#',
-                faceStrokeColor,
-                '" stroke-width="6.38" fill="white" shape-rendering="geometricPrecision"/>'                
-            )
+            abi.encodePacked(style(id), background(id), body(id))
         );
-
         return render;
+    }
+
+    function style(uint256 id) private view returns (string memory) {
+        return
+            string(
+                abi.encodePacked(
+                    '<style type="text/css"><![CDATA[',
+                    ".background{fill:#dad1c9;stroke:white;stroke-width:1}",
+                    ".body{fill:#dc7f70;stroke:white;stroke-width:5}",
+                    ".eye{fill:#e8d0d4;stroke:white;stroke-width:3}",
+                    ".mouth{fill:#e8d0d4;stroke:white;stroke-width:3}",
+                    ".branch{fill:#e8d0d4;stroke:white;stroke-width:4}",
+                    ".bottom{stroke:white;stroke-width:3}",
+                    ".leaf{fill:#efbbb6; stroke:white; stroke-width:5}",
+                    "]]></style>"
+                )
+            );
+    }
+
+    function background(uint256 id) private view returns (string memory) {
+        return
+            '<rect class="background" x="1" y="1" rx="2" ry="2" width="398" height="398" />';
+    }
+
+    // generate body part
+    function body(uint256 id) private view returns (string memory) {
+        uint256 _shape = shape[id];
+
+        // top point
+        uint256 topX = 200;
+        uint256 topY = 100;
+        // bottom point
+        uint256 bottomX = 200;
+        uint256 bottomY = uint256(300) +
+            (uint256(75) * uint256(uint8(_shape))) /
+            uint256(255);
+        // left point
+        uint256 delta = (uint256(50) * uint256(uint8(_shape >> 8))) /
+            uint256(255);
+        uint256 leftX = 50 + delta;
+        uint256 leftY = 200;
+        // right point
+        uint256 rightX = uint256(350) - delta;
+        uint256 rightY = 200;
+
+        // body type:
+        // 0: circle/ellipse
+        // 1: rectangle/square
+        // 2: triangle
+        // 3: diamond
+        // 4: oval
+        uint256 bodyType = uint256(_shape) % uint256(5);
+
+        if (bodyType == 0) {
+            // circle/eclipse
+            uint256 cx = 200;
+            uint256 cy = (topY + bottomY) / uint256(2);
+            uint256 rx = (rightX - leftX) / uint256(2);
+            uint256 ry = (bottomY - topY) / uint256(2);
+            return
+                string(
+                    abi.encodePacked(
+                        '<ellipse class="body" cx="',
+                        cx.toString(),
+                        '" cy="',
+                        cy.toString(),
+                        '" rx="',
+                        rx.toString(),
+                        '" ry="',
+                        ry.toString(),
+                        '"/>'
+                    )
+                );
+        } else if (bodyType == 1) {
+            // rectangle/square
+            uint256 width = rightX - leftX;
+            uint256 height = bottomY - topY;
+            uint256 r = (((width > height ? height : width) / uint256(4)) *
+                uint256(uint8(_shape >> 16))) / uint256(255);
+            return
+                string(
+                    abi.encodePacked(
+                        '<rect class="body" x="',
+                        leftX.toString(),
+                        '" y="',
+                        topY.toString(),
+                        '" width="',
+                        width.toString(),
+                        '" height="',
+                        height.toString(),
+                        '" rx="',
+                        r.toString(),
+                        '" ry="',
+                        r.toString(),
+                        '" />'
+                    )
+                );
+        } else if (bodyType == 2) {
+            // triangle
+            return
+                string(
+                    abi.encodePacked(
+                        '<polygon class="body" points="',
+                        leftX.toString(),
+                        ",",
+                        topY.toString(),
+                        " ",
+                        rightX.toString(),
+                        ",",
+                        topY.toString(),
+                        " 200,",
+                        bottomY.toString(),
+                        '"/>'
+                    )
+                );
+        } else if (bodyType == 3) {
+            // diamond
+            return
+                string(
+                    abi.encodePacked(
+                        '<polygon class="body" points="',
+                        leftX.toString(),
+                        ",",
+                        leftY.toString(),
+                        " ",
+                        topX.toString(),
+                        ",",
+                        topY.toString(),
+                        " ",
+                        rightX.toString(),
+                        ",",
+                        rightY.toString(),
+                        " ",
+                        bottomX.toString(),
+                        ",",
+                        bottomY.toString(),
+                        '"/>'
+                    )
+                );
+        } else {
+            // oval
+            uint256 controlY = topY /
+                2 +
+                ((leftY - topY / 2) * uint256(uint8(_shape >> 32))) /
+                uint256(255);
+            return
+                string(
+                    abi.encodePacked(
+                        '<path class="body" d="M',
+                        bottomX.toString(),
+                        ",",
+                        bottomY.toString(),
+                        " Q0,",
+                        controlY.toString(),
+                        " ",
+                        topX.toString(),
+                        ",",
+                        topY.toString(),
+                        " Q400,",
+                        controlY.toString(),
+                        " ",
+                        bottomX.toString(),
+                        ",",
+                        bottomY.toString(),
+                        ' Z"/>'
+                    )
+                );
+        }
     }
 }
