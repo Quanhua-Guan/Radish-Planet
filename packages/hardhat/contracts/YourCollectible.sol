@@ -19,7 +19,7 @@ contract YourCollectible is ERC721Enumerable, Ownable {
 
     Counters.Counter private _tokenIds;
 
-    constructor() ERC721("Oh Pandas", "OPD") {}
+    constructor() ERC721("Radish Planet", "RDH") {}
 
     mapping(uint256 => bytes3) public color;
     mapping(uint256 => uint256) public mouthWidth;
@@ -57,11 +57,11 @@ contract YourCollectible is ERC721Enumerable, Ownable {
         require(_exists(id), "!exist");
 
         string memory name = string(
-            abi.encodePacked("Oh Pandas #", id.toString())
+            abi.encodePacked("Radish #", id.toString())
         );
         string memory description = string(
             abi.encodePacked(
-                "This Oh Pandas borns with genes of color #",
+                "This Radish borns with genes of color #",
                 color[id].toColor(),
                 " and size ",
                 mouthWidth[id].toString(),
@@ -197,46 +197,10 @@ contract YourCollectible is ERC721Enumerable, Ownable {
         ) = getPropertiesById(id);
 
         string memory render = string(
-            abi.encodePacked(
-                // left ear
-                '<circle cx="90" cy="80" r="',
-                earSize.toString(),
-                '" fill="#',
-                leftEarColor,
-                '" shape-rendering="geometricPrecision"></circle>',
-                // right ear
-                '<circle cx="210" cy="80" r="',
-                earSize.toString(),
-                '" fill="#',
-                rightEarColor,
-                '" shape-rendering="geometricPrecision"></circle>',
-                // head(face)
+            abi.encodePacked(                
                 '<circle cx="150" cy="150" r="97" stroke="#',
                 faceStrokeColor,
-                '" stroke-width="6.38" fill="white" shape-rendering="geometricPrecision"/>',
-                // left eye
-                '<circle cx="115" cy="125" r="27.04" fill="#',
-                leftEyeColor,
-                '" shape-rendering="geometricPrecision"></circle>',
-                '<circle cx="115" cy="125" r="10.32" fill="white" shape-rendering="geometricPrecision"></circle>',
-                // right eye
-                '<circle cx="185" cy="125" r="27.04" fill="black" shape-rendering="geometricPrecision"></circle>',
-                '<circle cx="185" cy="125" r="10.32" fill="#',
-                rightEyeColor,
-                '" shape-rendering="geometricPrecision"></circle>',
-                '<circle cx="185" cy="125" r="6.38" fill="black" shape-rendering="geometricPrecision"></circle>',
-                // nose
-                '<circle cx="150" cy="170" r="',
-                noseSize.toString(),
-                '" fill="#',
-                noseColor,
-                '" shape-rendering="geometricPrecision"></circle>',
-                // mouse
-                '<ellipse cx="150" cy="210" rx="',
-                mouthSize.toString(),
-                '" ry="9.09" style="fill:#',
-                mouthColor,
-                ';stroke:black;stroke-width:3.94" shape-rendering="geometricPrecision"/>'
+                '" stroke-width="6.38" fill="white" shape-rendering="geometricPrecision"/>'                
             )
         );
 

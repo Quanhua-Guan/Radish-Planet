@@ -1,7 +1,7 @@
 {
-  "short_name": "Oh Pandas App",
+  "short_name": "Radish Planet App",
   "start_url": ".",
-  "name": "Oh Pandas App",
+  "name": "Radish Planet App",
   "icons": [
     {
       "src": "favicon.ico",
