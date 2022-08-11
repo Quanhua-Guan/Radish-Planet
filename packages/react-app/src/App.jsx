@@ -34,7 +34,7 @@ import { useStaticJsonRPC } from "./hooks";
 
 const { ethers } = require("ethers");
 /*
-    Welcome to Oh Pandas !
+    Welcome to Radish Planet !
 
     Code:
     https://github.com/scaffold-eth/scaffold-eth
@@ -53,7 +53,7 @@ const { ethers } = require("ethers");
 */
 
 /// 📡 What chain are your contracts deployed to?
-const initialNetwork = NETWORKS.rinkeby; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
+const initialNetwork = NETWORKS.localhost; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
 
 // 😬 Sorry for all the console logging
 const DEBUG = true;
@@ -92,9 +92,6 @@ function App(props) {
   const mainnetProvider = useStaticJsonRPC(providers);
 
   if (DEBUG) console.log(`Using ${selectedNetwork} network`);
-
-  // 🛰 providers
-  if (DEBUG) console.log("📡 Connecting to Mainnet Ethereum");
 
   const logoutOfWeb3Modal = async () => {
     await web3Modal.clearCachedProvider();
@@ -135,7 +132,7 @@ function App(props) {
   // The transactor wraps transactions and provides notificiations
   const tx = Transactor(userSigner, gasPrice);
 
-  // Oh Pandas is full of handy hooks like this one to get your balance:
+  // Radish Planet is full of handy hooks like this one to get your balance:
   const yourLocalBalance = useBalance(localProvider, address);
 
   // Just plug in different 🛰 providers to get your balance on different chains:
@@ -244,7 +241,7 @@ function App(props) {
       />
       <Menu style={{ textAlign: "center", marginTop: 20 }} selectedKeys={[location.pathname]} mode="horizontal">
         <Menu.Item key="/">
-          <Link to="/">Oh Pandas</Link>
+          <Link to="/">Radish Planet</Link>
         </Menu.Item>
         <Menu.Item key="/debug">
           <Link to="/debug">Smart Contracts</Link>

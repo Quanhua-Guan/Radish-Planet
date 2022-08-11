@@ -16,7 +16,7 @@ require("@nomiclabs/hardhat-etherscan");
 const { isAddress, getAddress, formatUnits, parseUnits } = utils;
 
 /*
-      📡 This is where you configure your deploy configuration for Oh Pandas
+      📡 This is where you configure your deploy configuration for Radish Planet
 
       check out `packages/scripts/deploy.js` to customize your deployment
 
@@ -27,7 +27,7 @@ const { isAddress, getAddress, formatUnits, parseUnits } = utils;
 //
 // Select the network you want to deploy to here:
 //
-const defaultNetwork = "rinkeby";
+const defaultNetwork = "localhost";
 
 const mainnetGwei = 21;
 
