@@ -9,8 +9,6 @@ import "base64-sol/base64.sol";
 
 import "./ToColor.sol";
 
-// GET LISTED ON OPENSEA: https://testnets.opensea.io/get-listed/step-two
-
 contract YourCollectible is ERC721Enumerable, Ownable {
     using Strings for uint256;
     using Strings for uint160;
@@ -93,7 +91,7 @@ contract YourCollectible is ERC721Enumerable, Ownable {
                                 name,
                                 '","description":"',
                                 description,
-                                '","external_url":"https://ohpandas.com/token/',
+                                '","external_url":"https://radishplanet.com/token/',
                                 id.toString(),
                                 '","attributes":[{"trait_type":"left ear color","value":"#',
                                 leftEarColor,
@@ -185,29 +183,47 @@ contract YourCollectible is ERC721Enumerable, Ownable {
     // Visibility is `public` to enable it being called by other contracts for composition.
     function renderTokenById(uint256 id) public view returns (string memory) {
         string memory render = string(
-            abi.encodePacked(style(id), background(id), body(id))
+            abi.encodePacked(style(id), background(), body(id), eyes(id))
         );
         return render;
     }
 
     function style(uint256 id) private view returns (string memory) {
+        bytes32 _shape = bytes32(shape[id]);
+        bytes3 _color = bytes2(_shape[0]) |
+            (bytes2(_shape[1]) >> 8) |
+            (bytes3(_shape[2]) >> 16);
+        bytes3 backgroundColor = _color;
+
         return
             string(
                 abi.encodePacked(
                     '<style type="text/css"><![CDATA[',
-                    ".background{fill:#dad1c9;stroke:white;stroke-width:1}",
-                    ".body{fill:#dc7f70;stroke:white;stroke-width:5}",
-                    ".eye{fill:#e8d0d4;stroke:white;stroke-width:3}",
+                    // background
+                    ".background{fill:#",
+                    backgroundColor.toColor(),
+                    ";stroke:white;stroke-width:1;fill-opacity:0.2}",
+                    // body
+                    ".body{fill:#",
+                    _color.toColor(),
+                    ";stroke:white;stroke-width:5}",
+                    // eye
+                    ".eye_l{fill:#e8d0d4;stroke:white;stroke-width:3}",
+                    ".eye_r{fill:#e8d0d4;stroke:white;stroke-width:3}",
+                    // mouth
                     ".mouth{fill:#e8d0d4;stroke:white;stroke-width:3}",
+                    // branch
                     ".branch{fill:#e8d0d4;stroke:white;stroke-width:4}",
-                    ".bottom{stroke:white;stroke-width:3}",
+                    // leaf
                     ".leaf{fill:#efbbb6; stroke:white; stroke-width:5}",
+                    // bottom
+                    ".bottom{stroke:white;stroke-width:3}",
                     "]]></style>"
                 )
             );
     }
 
-    function background(uint256 id) private view returns (string memory) {
+    function background() private pure returns (string memory) {
         return
             '<rect class="background" x="1" y="1" rx="2" ry="2" width="398" height="398" />';
     }
@@ -331,7 +347,7 @@ contract YourCollectible is ERC721Enumerable, Ownable {
             // oval
             uint256 controlY = topY /
                 2 +
-                ((leftY - topY / 2) * uint256(uint8(_shape >> 32))) /
+                ((leftY - topY / 2) * uint256(uint8(_shape >> 24))) /
                 uint256(255);
             return
                 string(
@@ -356,5 +372,196 @@ contract YourCollectible is ERC721Enumerable, Ownable {
                     )
                 );
         }
+    }
+
+    // generate eyes
+    function eyes(uint256 id) private view returns (string memory) {
+        uint256 _shape = shape[id];
+        bool hasSameEyes = (uint256(uint8(_shape >> 32)) % uint256(1000)) ==
+            uint256(0);
+        uint256 eyeType = uint256(uint8(_shape >> 40)) % uint256(36);
+
+        uint256 lx = 150;
+        uint256 rx = 250;
+        uint256 y = uint256(150) +
+            (uint256(50) * uint256(uint8(_shape >> 48))) /
+            uint256(255);
+        uint256 eyeSize = uint256(20) +
+            (uint256(20) * uint256(uint8(_shape >> 56))) /
+            uint256(255);
+
+        if (hasSameEyes) {
+            return
+                string(
+                    abi.encodePacked(
+                        eye(eyeType, eyeSize, lx, y, true),
+                        eye(eyeType, eyeSize, rx, y, false)
+                    )
+                );
+        } else {
+            uint256 eyeTypeAnother = uint256(uint8(_shape >> 64)) % uint256(36);
+            return
+                string(
+                    abi.encodePacked(
+                        eye(eyeType, eyeSize, lx, y, true),
+                        eye(eyeTypeAnother, eyeSize, rx, y, false)
+                    )
+                );
+        }
+    }
+
+    function eye(
+        uint256 eyeType,
+        uint256 eyeSize,
+        uint256 x,
+        uint256 y,
+        bool isLeft
+    ) private pure returns (string memory) {
+        eyeType %= 8; ////////// testing
+        string memory eyeClass = isLeft ? "eye_l" : "eye_r";
+        if (eyeType == 0) {
+            return
+                string(
+                    abi.encodePacked(
+                        '<circle class="',
+                        eyeClass,
+                        '" cx="',
+                        x.toString(),
+                        '" cy="',
+                        y.toString(),
+                        '" r="',
+                        (eyeSize / 2).toString(),
+                        '" />',
+                        '<circle class="',
+                        eyeClass,
+                        '" cx="',
+                        x.toString(),
+                        '" cy="',
+                        y.toString(),
+                        '" r="3" />'
+                    )
+                );
+        } else if (eyeType == 1) {
+            uint256 radius = eyeSize / 2;
+            string memory radiusString = radius.toString();
+            return
+                string(
+                    abi.encodePacked(
+                        '<path class="',
+                        eyeClass,
+                        '" d="M ',
+                        (x - radius).toString(),
+                        ",",
+                        y.toString(),
+                        " A ",
+                        radiusString,
+                        " ",
+                        radiusString,
+                        " 0 0 1 ",
+                        (x + radius).toString(),
+                        " ",
+                        y.toString(),
+                        '" fill-opacity="0.5" />'
+                    )
+                );
+        } else if (eyeType >= 2 && eyeType <= 4) {
+            return
+                string(
+                    abi.encodePacked(
+                        '<circle class="',
+                        eyeClass,
+                        '" cx="',
+                        x.toString(),
+                        '" cy="',
+                        y.toString(),
+                        '" r="',
+                        (eyeSize / 2).toString(),
+                        '" />',
+                        eyeType >= 3
+                            ? string(
+                                abi.encodePacked(
+                                    '<circle class="',
+                                    eyeClass,
+                                    '" cx="',
+                                    x.toString(),
+                                    '" cy="',
+                                    y.toString(),
+                                    '" r="',
+                                    (eyeSize / 4).toString(),
+                                    '" />'
+                                )
+                            )
+                            : "",
+                        eyeType >= 4
+                            ? string(
+                                abi.encodePacked(
+                                    '<circle class="',
+                                    eyeClass,
+                                    '" cx="',
+                                    x.toString(),
+                                    '" cy="',
+                                    y.toString(),
+                                    '" r="',
+                                    (eyeSize / 8).toString(),
+                                    '" />'
+                                )
+                            )
+                            : ""
+                    )
+                );
+        } else if (eyeType >= 5 && eyeType <= 7) {
+            return
+                string(
+                    abi.encodePacked(
+                        '<rect class="',
+                        eyeClass,
+                        '" x="',
+                        (x - eyeSize / uint256(2)).toString(),
+                        '" y="',
+                        (y - eyeSize / uint256(2)).toString(),
+                        '" width="',
+                        eyeSize.toString(),
+                        '" height="',
+                        eyeSize.toString(),
+                        '" />',
+                        eyeType >= 6
+                            ? string(
+                                abi.encodePacked(
+                                    '<rect class="',
+                                    eyeClass,
+                                    '" x="',
+                                    (x - eyeSize / uint256(4)).toString(),
+                                    '" y="',
+                                    (y - eyeSize / uint256(4)).toString(),
+                                    '" width="',
+                                    (eyeSize / uint256(2)).toString(),
+                                    '" height="',
+                                    (eyeSize / uint256(2)).toString(),
+                                    '" />'
+                                )
+                            )
+                            : "",
+                        eyeType >= 7
+                            ? string(
+                                abi.encodePacked(
+                                    '<rect class="',
+                                    eyeClass,
+                                    '" x="',
+                                    (x - eyeSize / uint256(8)).toString(),
+                                    '" y="',
+                                    (y - eyeSize / uint256(8)).toString(),
+                                    '" width="',
+                                    (eyeSize / uint256(4)).toString(),
+                                    '" height="',
+                                    (eyeSize / uint256(4)).toString(),
+                                    '" />'
+                                )
+                            )
+                            : ""
+                    )
+                );
+        }
+
+        return string(abi.encodePacked(""));
     }
 }
