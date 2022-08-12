@@ -210,6 +210,7 @@ contract YourCollectible is ERC721Enumerable, Ownable {
                     // eye
                     ".eye_l{fill:#e8d0d4;stroke:white;stroke-width:3}",
                     ".eye_r{fill:#e8d0d4;stroke:white;stroke-width:3}",
+                    ".eye_c{fill:#e8d0d4;stroke:white;stroke-width:1}",
                     // mouth
                     ".mouth{fill:#e8d0d4;stroke:white;stroke-width:3}",
                     // branch
@@ -417,7 +418,7 @@ contract YourCollectible is ERC721Enumerable, Ownable {
         uint256 y,
         bool isLeft
     ) private pure returns (string memory) {
-        eyeType %= 8; ////////// testing
+        eyeType = uint256(8) + (eyeType % uint256(5)); ////////// testing
         string memory eyeClass = isLeft ? "eye_l" : "eye_r";
         if (eyeType == 0) {
             return
@@ -495,9 +496,7 @@ contract YourCollectible is ERC721Enumerable, Ownable {
                         eyeType >= 4
                             ? string(
                                 abi.encodePacked(
-                                    '<circle class="',
-                                    eyeClass,
-                                    '" cx="',
+                                    '<circle class="eye_c" cx="',
                                     x.toString(),
                                     '" cy="',
                                     y.toString(),
@@ -523,7 +522,7 @@ contract YourCollectible is ERC721Enumerable, Ownable {
                         eyeSize.toString(),
                         '" height="',
                         eyeSize.toString(),
-                        '" />',
+                        (eyeSize % 2 == 0 ? '"/>' : '" rx="3" ry="3" />'),
                         eyeType >= 6
                             ? string(
                                 abi.encodePacked(
@@ -537,16 +536,18 @@ contract YourCollectible is ERC721Enumerable, Ownable {
                                     (eyeSize / uint256(2)).toString(),
                                     '" height="',
                                     (eyeSize / uint256(2)).toString(),
-                                    '" />'
+                                    (
+                                        eyeSize % 2 == 0
+                                            ? '"/>'
+                                            : '" rx="3" ry="3" />'
+                                    )
                                 )
                             )
                             : "",
                         eyeType >= 7
                             ? string(
                                 abi.encodePacked(
-                                    '<rect class="',
-                                    eyeClass,
-                                    '" x="',
+                                    '<rect class="eye_c" x="',
                                     (x - eyeSize / uint256(8)).toString(),
                                     '" y="',
                                     (y - eyeSize / uint256(8)).toString(),
@@ -554,13 +555,131 @@ contract YourCollectible is ERC721Enumerable, Ownable {
                                     (eyeSize / uint256(4)).toString(),
                                     '" height="',
                                     (eyeSize / uint256(4)).toString(),
-                                    '" />'
+                                    (
+                                        eyeSize % 2 == 0
+                                            ? '"/>'
+                                            : '" rx="1" ry="1" />'
+                                    )
                                 )
                             )
                             : ""
                     )
                 );
-        }
+        } else if (eyeType == 8 || eyeType == 9) {
+            uint256 r = eyeSize / uint256(2);
+            return
+                string(
+                    abi.encodePacked(
+                        '<polygon class="',
+                        eyeClass,
+                        '" points="',
+                        (x - r).toString(),
+                        ",",
+                        (y - r).toString(),
+                        " ",
+                        (x + r).toString(),
+                        ",",
+                        (y - r).toString(),
+                        " ",
+                        x.toString(),
+                        ",",
+                        (y + r).toString(),
+                        '"/>',
+                        eyeType == 9
+                            ? string(
+                                abi.encodePacked(
+                                    '<path class="',
+                                    eyeClass,
+                                    '" d="M',
+                                    x.toString(),
+                                    ",",
+                                    (y + r).toString(),
+                                    " L",
+                                    x.toString(),
+                                    ",",
+                                    (y - r).toString(),
+                                    '"/>'
+                                )
+                            )
+                            : ""
+                    )
+                );
+        } else if (eyeType == 10 || eyeType == 11) {
+            uint256 r = eyeSize / uint256(2);
+            return
+                string(
+                    abi.encodePacked(
+                        '<polygon class="',
+                        eyeClass,
+                        '" points="',
+                        (x - r).toString(),
+                        ",",
+                        (y + r).toString(),
+                        " ",
+                        (x + r).toString(),
+                        ",",
+                        (y + r).toString(),
+                        " ",
+                        x.toString(),
+                        ",",
+                        (y - r).toString(),
+                        '"/>',
+                        eyeType == 11
+                            ? string(
+                                abi.encodePacked(
+                                    '<path class="',
+                                    eyeClass,
+                                    '" d="M',
+                                    x.toString(),
+                                    ",",
+                                    (y + r).toString(),
+                                    " L",
+                                    x.toString(),
+                                    ",",
+                                    (y - r).toString(),
+                                    '"/>'
+                                )
+                            )
+                            : ""
+                    )
+                );
+        } else if (eyeType == 12) {
+            uint256 r = eyeSize / uint256(2);
+            uint256 rr = r - 5;
+            return
+                string(
+                    abi.encodePacked(
+                        '<circle class="',
+                        eyeClass,
+                        '" cx="',
+                        x.toString(),
+                        '" cy="',
+                        y.toString(),
+                        '" r="',
+                        r.toString(),
+                        '" />',
+                        '<polygon class="',
+                        eyeClass,
+                        '" points="',
+                        (x - rr).toString(),
+                        ",",
+                        y.toString(),
+                        " ",
+                        x.toString(),
+                        ",",
+                        (y - rr).toString(),
+                        " ",
+                        (x + rr).toString(),
+                        ",",
+                        y.toString(),
+                        " ",
+                        x.toString(),
+                        ",",
+                        (y + rr).toString(),
+                        '"/>'
+                    )
+                );
+        } else if (eyeType == 13) {}
 
         return string(abi.encodePacked(""));
     }
