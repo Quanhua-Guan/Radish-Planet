@@ -188,7 +188,7 @@ contract YourCollectible is ERC721Enumerable, Ownable {
         return render;
     }
 
-    function style(uint256 id) private view returns (string memory) {
+    function style(uint256 id) private view returns (bytes memory) {
         bytes32 _shape = bytes32(shape[id]);
         bytes3 _color = bytes2(_shape[0]) |
             (bytes2(_shape[1]) >> 8) |
@@ -196,31 +196,30 @@ contract YourCollectible is ERC721Enumerable, Ownable {
         bytes3 backgroundColor = _color;
 
         return
-            string(
-                abi.encodePacked(
-                    '<style type="text/css"><![CDATA[',
-                    // background
-                    ".background{fill:#",
-                    backgroundColor.toColor(),
-                    ";stroke:white;stroke-width:1;fill-opacity:0.2}",
-                    // body
-                    ".body{fill:#",
-                    _color.toColor(),
-                    ";stroke:white;stroke-width:5}",
-                    // eye
-                    ".eye_l{fill:#e8d0d4;stroke:white;stroke-width:3}",
-                    ".eye_r{fill:#e8d0d4;stroke:white;stroke-width:3}",
-                    ".eye_c{fill:#e8d0d4;stroke:white;stroke-width:1}",
-                    // mouth
-                    ".mouth{fill:#e8d0d4;stroke:white;stroke-width:3}",
-                    // branch
-                    ".branch{fill:#e8d0d4;stroke:white;stroke-width:4}",
-                    // leaf
-                    ".leaf{fill:#efbbb6; stroke:white; stroke-width:5}",
-                    // bottom
-                    ".bottom{stroke:white;stroke-width:3}",
-                    "]]></style>"
-                )
+            abi.encodePacked(
+                '<style type="text/css"><![CDATA[',
+                // background
+                ".background{fill:#",
+                backgroundColor.toColor(),
+                ";stroke:white;stroke-width:1;fill-opacity:0.2}",
+                // body
+                ".body{fill:#",
+                _color.toColor(),
+                ";stroke:white;stroke-width:5}",
+                // eye
+                ".eye_l{fill:#e8d0d4;stroke:white;stroke-width:3}",
+                ".eye_r{fill:#e8d0d4;stroke:white;stroke-width:3}",
+                ".eye_c{fill:#e8d0d4;stroke:white;stroke-width:1}",
+                ".eye_opacity{fill:#e8d0d4;stroke:white;stroke-width:3;fill-opacity:0.3}",
+                // mouth
+                ".mouth{fill:#e8d0d4;stroke:white;stroke-width:3}",
+                // branch
+                ".branch{fill:#e8d0d4;stroke:white;stroke-width:4}",
+                // leaf
+                ".leaf{fill:#efbbb6; stroke:white; stroke-width:5}",
+                // bottom
+                ".bottom{stroke:white;stroke-width:3}",
+                "]]></style>"
             );
     }
 
@@ -230,7 +229,7 @@ contract YourCollectible is ERC721Enumerable, Ownable {
     }
 
     // generate body part
-    function body(uint256 id) private view returns (string memory) {
+    function body(uint256 id) private view returns (bytes memory) {
         uint256 _shape = shape[id];
 
         // top point
@@ -265,18 +264,16 @@ contract YourCollectible is ERC721Enumerable, Ownable {
             uint256 rx = (rightX - leftX) / uint256(2);
             uint256 ry = (bottomY - topY) / uint256(2);
             return
-                string(
-                    abi.encodePacked(
-                        '<ellipse class="body" cx="',
-                        cx.toString(),
-                        '" cy="',
-                        cy.toString(),
-                        '" rx="',
-                        rx.toString(),
-                        '" ry="',
-                        ry.toString(),
-                        '"/>'
-                    )
+                abi.encodePacked(
+                    '<ellipse class="body" cx="',
+                    cx.toString(),
+                    '" cy="',
+                    cy.toString(),
+                    '" rx="',
+                    rx.toString(),
+                    '" ry="',
+                    ry.toString(),
+                    '"/>'
                 );
         } else if (bodyType == 1) {
             // rectangle/square
@@ -285,64 +282,58 @@ contract YourCollectible is ERC721Enumerable, Ownable {
             uint256 r = (((width > height ? height : width) / uint256(4)) *
                 uint256(uint8(_shape >> 16))) / uint256(255);
             return
-                string(
-                    abi.encodePacked(
-                        '<rect class="body" x="',
-                        leftX.toString(),
-                        '" y="',
-                        topY.toString(),
-                        '" width="',
-                        width.toString(),
-                        '" height="',
-                        height.toString(),
-                        '" rx="',
-                        r.toString(),
-                        '" ry="',
-                        r.toString(),
-                        '" />'
-                    )
+                abi.encodePacked(
+                    '<rect class="body" x="',
+                    leftX.toString(),
+                    '" y="',
+                    topY.toString(),
+                    '" width="',
+                    width.toString(),
+                    '" height="',
+                    height.toString(),
+                    '" rx="',
+                    r.toString(),
+                    '" ry="',
+                    r.toString(),
+                    '" />'
                 );
         } else if (bodyType == 2) {
             // triangle
             return
-                string(
-                    abi.encodePacked(
-                        '<polygon class="body" points="',
-                        leftX.toString(),
-                        ",",
-                        topY.toString(),
-                        " ",
-                        rightX.toString(),
-                        ",",
-                        topY.toString(),
-                        " 200,",
-                        bottomY.toString(),
-                        '"/>'
-                    )
+                abi.encodePacked(
+                    '<polygon class="body" points="',
+                    leftX.toString(),
+                    ",",
+                    topY.toString(),
+                    " ",
+                    rightX.toString(),
+                    ",",
+                    topY.toString(),
+                    " 200,",
+                    bottomY.toString(),
+                    '"/>'
                 );
         } else if (bodyType == 3) {
             // diamond
             return
-                string(
-                    abi.encodePacked(
-                        '<polygon class="body" points="',
-                        leftX.toString(),
-                        ",",
-                        leftY.toString(),
-                        " ",
-                        topX.toString(),
-                        ",",
-                        topY.toString(),
-                        " ",
-                        rightX.toString(),
-                        ",",
-                        rightY.toString(),
-                        " ",
-                        bottomX.toString(),
-                        ",",
-                        bottomY.toString(),
-                        '"/>'
-                    )
+                abi.encodePacked(
+                    '<polygon class="body" points="',
+                    leftX.toString(),
+                    ",",
+                    leftY.toString(),
+                    " ",
+                    topX.toString(),
+                    ",",
+                    topY.toString(),
+                    " ",
+                    rightX.toString(),
+                    ",",
+                    rightY.toString(),
+                    " ",
+                    bottomX.toString(),
+                    ",",
+                    bottomY.toString(),
+                    '"/>'
                 );
         } else {
             // oval
@@ -351,32 +342,30 @@ contract YourCollectible is ERC721Enumerable, Ownable {
                 ((leftY - topY / 2) * uint256(uint8(_shape >> 24))) /
                 uint256(255);
             return
-                string(
-                    abi.encodePacked(
-                        '<path class="body" d="M',
-                        bottomX.toString(),
-                        ",",
-                        bottomY.toString(),
-                        " Q0,",
-                        controlY.toString(),
-                        " ",
-                        topX.toString(),
-                        ",",
-                        topY.toString(),
-                        " Q400,",
-                        controlY.toString(),
-                        " ",
-                        bottomX.toString(),
-                        ",",
-                        bottomY.toString(),
-                        ' Z"/>'
-                    )
+                abi.encodePacked(
+                    '<path class="body" d="M',
+                    bottomX.toString(),
+                    ",",
+                    bottomY.toString(),
+                    " Q0,",
+                    controlY.toString(),
+                    " ",
+                    topX.toString(),
+                    ",",
+                    topY.toString(),
+                    " Q400,",
+                    controlY.toString(),
+                    " ",
+                    bottomX.toString(),
+                    ",",
+                    bottomY.toString(),
+                    ' Z"/>'
                 );
         }
     }
 
     // generate eyes
-    function eyes(uint256 id) private view returns (string memory) {
+    function eyes(uint256 id) private view returns (bytes memory) {
         uint256 _shape = shape[id];
         bool hasSameEyes = (uint256(uint8(_shape >> 32)) % uint256(1000)) ==
             uint256(0);
@@ -393,20 +382,16 @@ contract YourCollectible is ERC721Enumerable, Ownable {
 
         if (hasSameEyes) {
             return
-                string(
-                    abi.encodePacked(
-                        eye(eyeType, eyeSize, lx, y, true),
-                        eye(eyeType, eyeSize, rx, y, false)
-                    )
+                abi.encodePacked(
+                    eye(eyeType, eyeSize, lx, y, true),
+                    eye(eyeType, eyeSize, rx, y, false)
                 );
         } else {
             uint256 eyeTypeAnother = uint256(uint8(_shape >> 64)) % uint256(36);
             return
-                string(
-                    abi.encodePacked(
-                        eye(eyeType, eyeSize, lx, y, true),
-                        eye(eyeTypeAnother, eyeSize, rx, y, false)
-                    )
+                abi.encodePacked(
+                    eye(eyeType, eyeSize, lx, y, true),
+                    eye(eyeTypeAnother, eyeSize, rx, y, false)
                 );
         }
     }
@@ -417,270 +402,503 @@ contract YourCollectible is ERC721Enumerable, Ownable {
         uint256 x,
         uint256 y,
         bool isLeft
-    ) private pure returns (string memory) {
-        eyeType = uint256(8) + (eyeType % uint256(5)); ////////// testing
+    ) private pure returns (bytes memory) {
+        bytes memory emptyStringBytes = abi.encodePacked("");
         string memory eyeClass = isLeft ? "eye_l" : "eye_r";
+        uint256 r = eyeSize / uint256(2);
         if (eyeType == 0) {
             return
-                string(
-                    abi.encodePacked(
-                        '<circle class="',
-                        eyeClass,
-                        '" cx="',
-                        x.toString(),
-                        '" cy="',
-                        y.toString(),
-                        '" r="',
-                        (eyeSize / 2).toString(),
-                        '" />',
-                        '<circle class="',
-                        eyeClass,
-                        '" cx="',
-                        x.toString(),
-                        '" cy="',
-                        y.toString(),
-                        '" r="3" />'
-                    )
+                abi.encodePacked(
+                    genCircle(x, y, r, eyeClass),
+                    genCircle(x, y, uint256(3), eyeClass)
                 );
         } else if (eyeType == 1) {
-            uint256 radius = eyeSize / 2;
-            string memory radiusString = radius.toString();
-            return
-                string(
-                    abi.encodePacked(
-                        '<path class="',
-                        eyeClass,
-                        '" d="M ',
-                        (x - radius).toString(),
-                        ",",
-                        y.toString(),
-                        " A ",
-                        radiusString,
-                        " ",
-                        radiusString,
-                        " 0 0 1 ",
-                        (x + radius).toString(),
-                        " ",
-                        y.toString(),
-                        '" fill-opacity="0.5" />'
-                    )
-                );
+            return genHalfCircle(x, y, r, true, false, eyeClass);
         } else if (eyeType >= 2 && eyeType <= 4) {
             return
-                string(
-                    abi.encodePacked(
-                        '<circle class="',
-                        eyeClass,
-                        '" cx="',
-                        x.toString(),
-                        '" cy="',
-                        y.toString(),
-                        '" r="',
-                        (eyeSize / 2).toString(),
-                        '" />',
-                        eyeType >= 3
-                            ? string(
-                                abi.encodePacked(
-                                    '<circle class="',
-                                    eyeClass,
-                                    '" cx="',
-                                    x.toString(),
-                                    '" cy="',
-                                    y.toString(),
-                                    '" r="',
-                                    (eyeSize / 4).toString(),
-                                    '" />'
-                                )
-                            )
-                            : "",
-                        eyeType >= 4
-                            ? string(
-                                abi.encodePacked(
-                                    '<circle class="eye_c" cx="',
-                                    x.toString(),
-                                    '" cy="',
-                                    y.toString(),
-                                    '" r="',
-                                    (eyeSize / 8).toString(),
-                                    '" />'
-                                )
-                            )
-                            : ""
-                    )
+                abi.encodePacked(
+                    genCircle(x, y, eyeSize / 2, eyeClass),
+                    eyeType >= 3
+                        ? genCircle(x, y, eyeSize / 4, eyeClass)
+                        : emptyStringBytes,
+                    eyeType == 4
+                        ? genCircle(x, y, eyeSize / 8, "eye_c")
+                        : emptyStringBytes
                 );
         } else if (eyeType >= 5 && eyeType <= 7) {
+            uint256 cornerRadius = uint256(eyeSize % 2 == 0 ? 0 : 3);
             return
-                string(
-                    abi.encodePacked(
-                        '<rect class="',
-                        eyeClass,
-                        '" x="',
-                        (x - eyeSize / uint256(2)).toString(),
-                        '" y="',
-                        (y - eyeSize / uint256(2)).toString(),
-                        '" width="',
-                        eyeSize.toString(),
-                        '" height="',
-                        eyeSize.toString(),
-                        (eyeSize % 2 == 0 ? '"/>' : '" rx="3" ry="3" />'),
-                        eyeType >= 6
-                            ? string(
-                                abi.encodePacked(
-                                    '<rect class="',
-                                    eyeClass,
-                                    '" x="',
-                                    (x - eyeSize / uint256(4)).toString(),
-                                    '" y="',
-                                    (y - eyeSize / uint256(4)).toString(),
-                                    '" width="',
-                                    (eyeSize / uint256(2)).toString(),
-                                    '" height="',
-                                    (eyeSize / uint256(2)).toString(),
-                                    (
-                                        eyeSize % 2 == 0
-                                            ? '"/>'
-                                            : '" rx="3" ry="3" />'
-                                    )
-                                )
-                            )
-                            : "",
-                        eyeType >= 7
-                            ? string(
-                                abi.encodePacked(
-                                    '<rect class="eye_c" x="',
-                                    (x - eyeSize / uint256(8)).toString(),
-                                    '" y="',
-                                    (y - eyeSize / uint256(8)).toString(),
-                                    '" width="',
-                                    (eyeSize / uint256(4)).toString(),
-                                    '" height="',
-                                    (eyeSize / uint256(4)).toString(),
-                                    (
-                                        eyeSize % 2 == 0
-                                            ? '"/>'
-                                            : '" rx="1" ry="1" />'
-                                    )
-                                )
-                            )
-                            : ""
-                    )
+                abi.encodePacked(
+                    genRect(
+                        x,
+                        y,
+                        eyeSize,
+                        eyeSize,
+                        cornerRadius,
+                        cornerRadius,
+                        eyeClass
+                    ),
+                    eyeType >= 6
+                        ? genRect(
+                            x,
+                            y,
+                            eyeSize / uint256(2),
+                            eyeSize / uint256(2),
+                            cornerRadius,
+                            cornerRadius,
+                            eyeClass
+                        )
+                        : emptyStringBytes,
+                    eyeType >= 7
+                        ? genRect(
+                            x,
+                            y,
+                            eyeSize / uint256(4),
+                            eyeSize / uint256(4),
+                            1,
+                            1,
+                            "eye_c"
+                        )
+                        : emptyStringBytes
                 );
         } else if (eyeType == 8 || eyeType == 9) {
-            uint256 r = eyeSize / uint256(2);
             return
-                string(
-                    abi.encodePacked(
-                        '<polygon class="',
-                        eyeClass,
-                        '" points="',
-                        (x - r).toString(),
-                        ",",
-                        (y - r).toString(),
-                        " ",
-                        (x + r).toString(),
-                        ",",
-                        (y - r).toString(),
-                        " ",
-                        x.toString(),
-                        ",",
-                        (y + r).toString(),
-                        '"/>',
-                        eyeType == 9
-                            ? string(
-                                abi.encodePacked(
-                                    '<path class="',
-                                    eyeClass,
-                                    '" d="M',
-                                    x.toString(),
-                                    ",",
-                                    (y + r).toString(),
-                                    " L",
-                                    x.toString(),
-                                    ",",
-                                    (y - r).toString(),
-                                    '"/>'
-                                )
-                            )
-                            : ""
-                    )
+                abi.encodePacked(
+                    genDownTriangle(x, y, r, eyeClass),
+                    eyeType == 9
+                        ? genLine(x, y + r, x, y - r, eyeClass)
+                        : emptyStringBytes
                 );
         } else if (eyeType == 10 || eyeType == 11) {
-            uint256 r = eyeSize / uint256(2);
             return
-                string(
-                    abi.encodePacked(
-                        '<polygon class="',
-                        eyeClass,
-                        '" points="',
-                        (x - r).toString(),
-                        ",",
-                        (y + r).toString(),
-                        " ",
-                        (x + r).toString(),
-                        ",",
-                        (y + r).toString(),
-                        " ",
-                        x.toString(),
-                        ",",
-                        (y - r).toString(),
-                        '"/>',
-                        eyeType == 11
-                            ? string(
-                                abi.encodePacked(
-                                    '<path class="',
-                                    eyeClass,
-                                    '" d="M',
-                                    x.toString(),
-                                    ",",
-                                    (y + r).toString(),
-                                    " L",
-                                    x.toString(),
-                                    ",",
-                                    (y - r).toString(),
-                                    '"/>'
-                                )
-                            )
-                            : ""
-                    )
+                abi.encodePacked(
+                    genUpTriangle(x, y, r, eyeClass),
+                    eyeType == 11
+                        ? genLine(x, y + r, x, y - r, eyeClass)
+                        : emptyStringBytes
                 );
         } else if (eyeType == 12) {
-            uint256 r = eyeSize / uint256(2);
             uint256 rr = r - 5;
             return
-                string(
-                    abi.encodePacked(
-                        '<circle class="',
-                        eyeClass,
-                        '" cx="',
-                        x.toString(),
-                        '" cy="',
-                        y.toString(),
-                        '" r="',
-                        r.toString(),
-                        '" />',
-                        '<polygon class="',
-                        eyeClass,
-                        '" points="',
-                        (x - rr).toString(),
-                        ",",
-                        y.toString(),
-                        " ",
-                        x.toString(),
-                        ",",
-                        (y - rr).toString(),
-                        " ",
-                        (x + rr).toString(),
-                        ",",
-                        y.toString(),
-                        " ",
-                        x.toString(),
-                        ",",
-                        (y + rr).toString(),
-                        '"/>'
-                    )
+                abi.encodePacked(
+                    genCircle(x, y, r, eyeClass),
+                    genRhombus(x, y, rr, eyeClass)
                 );
-        } else if (eyeType == 13) {}
+        } else if (eyeType == 13 || eyeType == 14) {
+            return
+                abi.encodePacked(
+                    eyeType == 14
+                        ? genCircle(x, y, r, eyeClass)
+                        : emptyStringBytes,
+                    genLine(x, y + r, x, y - r, eyeClass),
+                    genLine(x - r, y, x + r, y, eyeClass)
+                );
+        } else if (eyeType >= 15 && eyeType <= 17) {
+            return
+                abi.encodePacked(
+                    eyeType == 15 || eyeType == 16
+                        ? genUpArrow(x, y, r, "eye_opacity")
+                        : emptyStringBytes,
+                    eyeType == 17 || eyeType == 16
+                        ? genDownArrow(x, y, r, "eye_opacity")
+                        : emptyStringBytes
+                );
+        } else if (eyeType == 18 || eyeType == 19) {
+            uint256 rr = r / uint256(2);
+            return
+                abi.encodePacked(
+                    eyeType == 19
+                        ? genCircle(x, y, r, eyeClass)
+                        : emptyStringBytes,
+                    genLine(x - rr, y - rr, x + rr, y + rr, eyeClass),
+                    genLine(x - rr, y + rr, x + rr, y - rr, eyeClass)
+                );
+        } else if (eyeType == 20 || eyeType == 21) {
+            uint256 rr = r / uint256(2);
+            return
+                abi.encodePacked(
+                    genRect(x, y, eyeSize, eyeSize, 0, 0, "eye_opacity"),
+                    eyeType == 20
+                        ? genRect(x - rr, y - rr, r, r, 0, 0, "eye_opacity")
+                        : genRect(x - rr, y + rr, r, r, 0, 0, "eye_opacity"),
+                    eyeType == 20
+                        ? genRect(x + rr, y + rr, r, r, 0, 0, "eye_opacity")
+                        : genRect(x + rr, y - rr, r, r, 0, 0, "eye_opacity")
+                );
+        } else if (eyeType == 22 || eyeType == 23) {
+            uint256 rr = r - uint256(5);
+            return
+                abi.encodePacked(
+                    eyeType == 23
+                        ? genCircle(x, y, r, eyeClass)
+                        : emptyStringBytes,
+                    genLine(x - rr, y, x + rr, y, eyeClass)
+                );
+        } else if (eyeType == 24) {
+            uint256 rr = r / uint256(4);
+            return
+                abi.encodePacked(
+                    genLine(x - r, y - rr, x + r, y - rr, eyeClass),
+                    genLine(x - r, y + rr, x + r, y + rr, eyeClass),
+                    genLine(x - rr, y - r, x - rr, y + r, eyeClass),
+                    genLine(x + rr, y - r, x + rr, y + r, eyeClass)
+                );
+        } else if (eyeType >= 25 && eyeType <= 27) {
+            return
+                abi.encodePacked(
+                    genRhombus(x, y, r, eyeClass),
+                    eyeType == 25
+                        ? genLine(x - r, y, x + r, y, eyeClass)
+                        : emptyStringBytes,
+                    eyeType == 25
+                        ? genLine(x, y - r, x, y + r, eyeClass)
+                        : emptyStringBytes,
+                    eyeType == 26
+                        ? genCircle(x, y, 3, eyeClass)
+                        : emptyStringBytes,
+                    eyeType == 27
+                        ? genRhombus(x, y, r / uint256(2), eyeClass)
+                        : emptyStringBytes
+                );
+        } else if (eyeType == 28 || eyeType == 29) {
+            uint256 rr = r / uint256(2);
+            return
+                abi.encodePacked(
+                    genCircle(x, y, r, eyeClass),
+                    eyeType == 28
+                        ? genRect(x, y, rr, rr, 0, 0, eyeClass)
+                        : genUpTriangle(x, y, rr, eyeClass)
+                );
+        } else if (eyeType == 30 || eyeType == 31) {
+            return genHeart(x, y, r, eyeType == 30, eyeClass);
+        } else if (eyeType == 32 || eyeType == 33) {
+            uint256 rr = r / uint256(2);
+            return
+                abi.encodePacked(
+                    genRect(x, y, eyeSize, eyeSize, 0, 0, eyeClass),
+                    eyeType == 32
+                        ? genLine(x - rr, y, x + rr, y, eyeClass)
+                        : genLine(x, y - rr, x, y + rr, eyeClass)
+                );
+        } else if (eyeType == 34) {
+            uint256 rr = (r * uint256(3)) / uint256(4);
+            return
+                abi.encodePacked(
+                    genUpTriangle(x, y, rr, "eye_opacity"),
+                    genDownTriangle(x, y, rr, "eye_opacity")
+                );
+        } else if (eyeType == 35 || eyeType == 36) {
+            uint256 rr = r / uint256(2);
+            return
+                abi.encodePacked(
+                    genRhombus(x, y, r, eyeClass),
+                    eyeType == 35
+                        ? genLine(x - rr, y, x + rr, y, eyeClass)
+                        : genLine(x, y - rr, x, y + rr, eyeClass)
+                );
+        } else if (eyeType == 37 || eyeType == 38) {
+            uint256 rr = r / uint256(2);
+            return
+                abi.encodePacked(
+                    eyeType == 37
+                        ? genCircle(x, y, r, eyeClass)
+                        : emptyStringBytes,
+                    genLine(x, y - rr, x, y + rr, eyeClass)
+                );
+        } else if (eyeType == 39) {
+            return genCircle(x, y, 3, eyeClass);
+        } else {
+            // eyeType == 40
+            uint256 rr = r / uint256(2);
+            return
+                abi.encodePacked(
+                    genLine(x - r, y, x + r, y, eyeClass),
+                    genLine(x - rr, y - rr, x - rr, y + rr, eyeClass),
+                    genLine(x + rr, y - rr, x + rr, y + rr, eyeClass)
+                );
+        }
+    }
 
-        return string(abi.encodePacked(""));
+    /// generate circle with center (cx, cy) and radius and the svg class.
+    function genCircle(
+        uint256 cx,
+        uint256 cy,
+        uint256 radius,
+        string memory class
+    ) private pure returns (bytes memory) {
+        return
+            abi.encodePacked(
+                '<circle class="',
+                class,
+                '" cx="',
+                cx.toString(),
+                '" cy="',
+                cy.toString(),
+                '" r="',
+                radius.toString(),
+                '" />'
+            );
+    }
+
+    /// generate rect with center (cx, cy), width, height, cornerRadiusX, cornerRadiusY and the svg class.
+    function genRect(
+        uint256 cx,
+        uint256 cy,
+        uint256 width,
+        uint256 height,
+        uint256 cornerRadiusX,
+        uint256 cornerRadiusY,
+        string memory class
+    ) private pure returns (bytes memory) {
+        return
+            abi.encodePacked(
+                '<rect class="',
+                class,
+                '" x="',
+                (cx - width / uint256(2)).toString(),
+                '" y="',
+                (cy - height / uint256(2)).toString(),
+                '" width="',
+                width.toString(),
+                '" height="',
+                height.toString(),
+                '" rx="',
+                cornerRadiusX.toString(),
+                '" ry="',
+                cornerRadiusY.toString(),
+                '" />'
+            );
+    }
+
+    /// generate rhombus with center (cx, cy), radius and the svg class
+    function genRhombus(
+        uint256 cx,
+        uint256 cy,
+        uint256 radius,
+        string memory class
+    ) private pure returns (bytes memory) {
+        return
+            abi.encodePacked(
+                '<polygon class="',
+                class,
+                '" points="',
+                (cx - radius).toString(),
+                ",",
+                cy.toString(),
+                " ",
+                cx.toString(),
+                ",",
+                (cy - radius).toString(),
+                " ",
+                (cx + radius).toString(),
+                ",",
+                cy.toString(),
+                " ",
+                cx.toString(),
+                ",",
+                (cy + radius).toString(),
+                '"/>'
+            );
+    }
+
+    /// generate up triangle △ with center (cx, cy), radius and the svg class
+    function genUpTriangle(
+        uint256 cx,
+        uint256 cy,
+        uint256 radius,
+        string memory class
+    ) private pure returns (bytes memory) {
+        return
+            abi.encodePacked(
+                '<polygon class="',
+                class,
+                '" points="',
+                (cx - radius).toString(),
+                ",",
+                (cy + radius).toString(),
+                " ",
+                (cx + radius).toString(),
+                ",",
+                (cy + radius).toString(),
+                " ",
+                cx.toString(),
+                ",",
+                (cy - radius).toString(),
+                '"/>'
+            );
+    }
+
+    /// generate down triangle with center (cx, cy), radius and the svg class
+    function genDownTriangle(
+        uint256 cx,
+        uint256 cy,
+        uint256 radius,
+        string memory class
+    ) private pure returns (bytes memory) {
+        return
+            abi.encodePacked(
+                '<polygon class="',
+                class,
+                '" points="',
+                (cx - radius).toString(),
+                ",",
+                (cy - radius).toString(),
+                " ",
+                (cx + radius).toString(),
+                ",",
+                (cy - radius).toString(),
+                " ",
+                cx.toString(),
+                ",",
+                (cy + radius).toString(),
+                '"/>'
+            );
+    }
+
+    /// generate strait line from (x1, y1) to (x2, y2)
+    function genLine(
+        uint256 x1,
+        uint256 y1,
+        uint256 x2,
+        uint256 y2,
+        string memory class
+    ) private pure returns (bytes memory) {
+        return
+            abi.encodePacked(
+                '<path class="',
+                class,
+                '" d="M',
+                x1.toString(),
+                ",",
+                y1.toString(),
+                " L",
+                x2.toString(),
+                ",",
+                y2.toString(),
+                '"/>'
+            );
+    }
+
+    /// generate up arrow with center (cx, cy), radius and the svg class.
+    function genUpArrow(
+        uint256 cx,
+        uint256 cy,
+        uint256 radius,
+        string memory class
+    ) private pure returns (bytes memory) {
+        return
+            abi.encodePacked(
+                '<path class="',
+                class,
+                '" d="M',
+                (cx - radius).toString(),
+                ",",
+                (cy + radius).toString(),
+                " L",
+                cx.toString(),
+                ",",
+                (cy - radius).toString(),
+                " L",
+                (cx + radius).toString(),
+                ",",
+                (cy + radius).toString(),
+                '"/>'
+            );
+    }
+
+    /// generate down arrow with center (cx, cy), radius and the svg class.
+    function genDownArrow(
+        uint256 cx,
+        uint256 cy,
+        uint256 radius,
+        string memory class
+    ) private pure returns (bytes memory) {
+        return
+            abi.encodePacked(
+                '<path class="',
+                class,
+                '" d="M',
+                (cx - radius).toString(),
+                ",",
+                (cy - radius).toString(),
+                " L",
+                cx.toString(),
+                ",",
+                (cy + radius).toString(),
+                " L",
+                (cx + radius).toString(),
+                ",",
+                (cy - radius).toString(),
+                '"/>'
+            );
+    }
+
+    /// generate heart with center (cx, cy), radius, top is flat param and the svg class.
+    function genHeart(
+        uint256 cx,
+        uint256 cy,
+        uint256 radius,
+        bool isFlat,
+        string memory class
+    ) private pure returns (bytes memory) {
+        uint256 ty = cy -
+            (isFlat ? radius : ((uint256(4) * radius) / uint256(5)));
+        uint256 rr = (radius * uint256(3)) / uint256(2);
+        return
+            abi.encodePacked(
+                '<path class="',
+                class,
+                '" d="M',
+                cx.toString(),
+                ",",
+                (cy + radius).toString(),
+                " Q",
+                (cx - rr).toString(),
+                ",",
+                (cy - radius).toString(),
+                " ",
+                cx.toString(),
+                ",",
+                ty.toString(),
+                " Q",
+                (cx + rr).toString(),
+                ",",
+                (cy - radius).toString(),
+                " ",
+                cx.toString(),
+                ",",
+                (cy + radius).toString(),
+                ' Z"/>'
+            );
+    }
+
+    /// generate half circle with center (cx, cy), radius and the svg class.
+    function genHalfCircle(
+        uint256 cx,
+        uint256 cy,
+        uint256 radius,
+        bool isTop,
+        bool closed,
+        string memory class
+    ) private pure returns (bytes memory) {
+        string memory radiusString = radius.toString();
+        return
+            abi.encodePacked(
+                '<path class="',
+                class,
+                '" d="M ',
+                (cx - radius).toString(),
+                ",",
+                cy.toString(),
+                " A ",
+                radiusString,
+                " ",
+                radiusString,
+                isTop ? " 0 0 1 " : " 0 0 0 ",
+                (cx + radius).toString(),
+                " ",
+                cy.toString(),
+                closed ? ' Z"/>' : '"/>'
+            );
     }
 }
