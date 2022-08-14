@@ -20,7 +20,6 @@ contract YourCollectible is ERC721Enumerable, Ownable {
     constructor() ERC721("Radish Planet", "RDH") {}
 
     mapping(uint256 => uint256) public birth;
-    mapping(uint256 => bytes3) public color;
     mapping(uint256 => uint256) public shape;
 
     uint256 mintDeadline = block.timestamp + 3650 days;
@@ -42,10 +41,6 @@ contract YourCollectible is ERC721Enumerable, Ownable {
             )
         );
 
-        color[id] =
-            bytes2(predictableRandom[0]) |
-            (bytes2(predictableRandom[1]) >> 8) |
-            (bytes3(predictableRandom[2]) >> 16);
         shape[id] = uint256(predictableRandom);
         birth[id] = block.timestamp;
 
@@ -59,27 +54,19 @@ contract YourCollectible is ERC721Enumerable, Ownable {
             abi.encodePacked("Radish #", id.toString())
         );
         string memory description = string(
+            abi.encodePacked("This Radish borns with genes of color #", "!!!")
+        );
+        string memory image = Base64.encode(
             abi.encodePacked(
-                "This Radish borns with genes of color #",
-                color[id].toColor(),
-                // " and size ",
-                // shape[id].toString(),
-                "!!!"
+                '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" version="1.1">',
+                style(id),
+                background(),
+                body(id),
+                eyes(id),
+                mouth(id),
+                "</svg>"
             )
         );
-        string memory image = Base64.encode(bytes(generateSVGofTokenById(id)));
-        (
-            string memory leftEarColor,
-            string memory rightEarColor,
-            string memory faceStrokeColor,
-            string memory leftEyeColor,
-            string memory rightEyeColor,
-            string memory noseColor,
-            string memory mouthColor,
-            uint256 mouthSize,
-            uint256 earSize,
-            uint256 noseSize
-        ) = getPropertiesById(id);
         return
             string(
                 abi.encodePacked(
@@ -94,25 +81,6 @@ contract YourCollectible is ERC721Enumerable, Ownable {
                                 '","external_url":"https://radishplanet.com/token/',
                                 id.toString(),
                                 '","attributes":[{"trait_type":"left ear color","value":"#',
-                                leftEarColor,
-                                '"},{"trait_type":"right ear color","value":"#',
-                                rightEarColor,
-                                '"},{"trait_type":"facial outline color","value":"#',
-                                faceStrokeColor,
-                                '"},{"trait_type":"left eye color","value":"#',
-                                leftEyeColor,
-                                '"},{"trait_type":"right eye color","value":"#',
-                                rightEyeColor,
-                                '"},{"trait_type":"nose color","value":"#',
-                                noseColor,
-                                '"},{"trait_type":"mouth color","value":"#',
-                                mouthColor,
-                                '"},{"trait_type":"mouth size","value":"',
-                                mouthSize.toString(),
-                                '"},{"trait_type":"ear size","value": "',
-                                earSize.toString(),
-                                '"},{"trait_type":"nose size","value": "',
-                                noseSize.toString(),
                                 '"}],"owner":"',
                                 (uint160(ownerOf(id))).toHexString(20),
                                 '","image": "',
@@ -124,68 +92,6 @@ contract YourCollectible is ERC721Enumerable, Ownable {
                     )
                 )
             );
-    }
-
-    // function generateSVGofTokenById(uint256 id) internal view returns (string memory) {
-    function generateSVGofTokenById(uint256 id)
-        internal
-        view
-        returns (string memory)
-    {
-        string memory svg = string(
-            abi.encodePacked(
-                '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink">',
-                renderTokenById(id),
-                "</svg>"
-            )
-        );
-        return svg;
-    }
-
-    // properties of the token of id
-    function getPropertiesById(uint256 id)
-        public
-        view
-        returns (
-            string memory leftEarColor,
-            string memory rightEarColor,
-            string memory faceStrokeColor,
-            string memory leftEyeColor,
-            string memory rightEyeColor,
-            string memory noseColor,
-            string memory mouthColor,
-            uint256 mouthSize,
-            uint256 earSize,
-            uint256 noseSize
-        )
-    {
-        uint24 theColor = uint24(color[id]);
-        leftEarColor = bytes3(theColor).toColor();
-        rightEarColor;
-        faceStrokeColor;
-        leftEyeColor;
-        rightEyeColor;
-        noseColor;
-        mouthColor;
-        mouthSize = shape[id];
-        earSize = 20 + mouthSize / 2;
-        noseSize = 17 + mouthSize / 8;
-        unchecked {
-            rightEarColor = bytes3(theColor + 0xF5F7E3).toColor();
-            faceStrokeColor = bytes3(theColor + 0xDDD5ED).toColor();
-            leftEyeColor = bytes3(theColor + 0xBCB5DD).toColor();
-            rightEyeColor = bytes3(theColor + 0x9079A8).toColor();
-            noseColor = bytes3(theColor + 0x625068).toColor();
-            mouthColor = bytes3(theColor + 0x8D64A8).toColor();
-        }
-    }
-
-    // Visibility is `public` to enable it being called by other contracts for composition.
-    function renderTokenById(uint256 id) public view returns (string memory) {
-        string memory render = string(
-            abi.encodePacked(style(id), background(), body(id), eyes(id))
-        );
-        return render;
     }
 
     function style(uint256 id) private view returns (bytes memory) {
@@ -213,6 +119,7 @@ contract YourCollectible is ERC721Enumerable, Ownable {
                 ".eye_opacity{fill:#e8d0d4;stroke:white;stroke-width:3;fill-opacity:0.3}",
                 // mouth
                 ".mouth{fill:#e8d0d4;stroke:white;stroke-width:3}",
+                ".mouth_opacity{fill:#e8d0d4;stroke:white;stroke-width:3;fill-opacity:0.3}",
                 // branch
                 ".branch{fill:#e8d0d4;stroke:white;stroke-width:4}",
                 // leaf
@@ -398,6 +305,7 @@ contract YourCollectible is ERC721Enumerable, Ownable {
         }
     }
 
+    // generate single eye
     function eye(
         uint256 eyeType,
         uint256 eyeSize,
@@ -405,7 +313,6 @@ contract YourCollectible is ERC721Enumerable, Ownable {
         uint256 y,
         bool isLeft
     ) private pure returns (bytes memory) {
-        eyeType = uint256(41) + (eyeType % uint256(3));
         bytes memory emptyStringBytes = abi.encodePacked("");
         string memory eyeClass = isLeft ? "eye_l" : "eye_r";
         uint256 r = eyeSize / uint256(2);
@@ -625,6 +532,117 @@ contract YourCollectible is ERC721Enumerable, Ownable {
             return genHalfCircle(x, y, r, true, true, eyeClass);
         }
     }
+
+    // generate mouth
+    function mouth(uint256 id) private view returns (bytes memory) {
+        uint256 _shape = shape[id];
+        uint256 mouthType = uint256(uint8(_shape >> 72)) % 14;
+        uint256 x = 200;
+        uint256 y = 250 +
+            ((uint256(30) * uint256(uint8(_shape >> 80))) / uint256(255));
+        uint256 w = 20 +
+            ((uint256(60) * uint256(uint8(_shape >> 88))) / uint256(255));
+        uint256 h = 20 +
+            ((uint256(30) * uint256(uint8(_shape >> 96))) / uint256(255));
+        uint256 minSide = (w > h ? h : w);
+        uint256 radius = minSide / uint256(2);
+
+        string memory class = "mouth";
+        mouthType = uint256(12) + (mouthType % uint256(2)); ////////
+        if (mouthType == 0) {
+            return genCircle(x, y, radius, class);
+        } else if (mouthType == 1) {
+            uint256 cornerRadius = ((radius / uint256(2)) *
+                uint256(uint8(_shape >> 104))) / uint256(255);
+            return genRect(x, y, w, h, cornerRadius, cornerRadius, class);
+        } else if (mouthType == 2) {
+            return genDownTriangle(x, y, radius, class);
+        } else if (mouthType == 3) {
+            return genUpTriangle(x, y, radius, class);
+        } else if (mouthType == 4) {
+            uint256 r = w / uint256(2);
+            return
+                abi.encodePacked(
+                    genLine(
+                        x - r,
+                        y - uint256(5),
+                        x + r,
+                        y - uint256(5),
+                        class
+                    ),
+                    genLine(x - r, y + uint256(5), x + r, y + uint256(5), class)
+                );
+        } else if (mouthType == 5) {
+            uint256 r = w / uint256(2);
+            return genLine(x - r, y, x + r, y, class);
+        } else if (mouthType == 6) {
+            uint256 r = radius / uint256(2);
+            uint256 yy = y - r / uint256(2);
+            class = "mouth_opacity";
+            return
+                abi.encodePacked(
+                    genHalfCircle(x - r, y, r, false, false, class),
+                    genHalfCircle(x + r, y, r, false, false, class),
+                    genLine(x - r, yy, x + r, yy, class)
+                );
+        } else if (mouthType == 7) {
+            uint256 ww = w / uint256(2);
+            uint256 hh = h / uint256(2);
+            return
+                abi.encodePacked(
+                    genLine(x - ww, y, x, y + hh, class),
+                    genLine(x, y + hh, x + ww, y, class)
+                );
+        } else if (mouthType == 8) {
+            return genEllipse(x, y, w / uint256(2), h / uint256(2), class);
+        } else if (mouthType == 9 || mouthType == 10) {
+            return genHalfCircle(x, y, radius, false, mouthType == 10, class);
+        } else if (mouthType == 11) {
+            uint256 rr = radius / uint256(2);
+            uint256 rrr = 3;
+            return
+                abi.encodePacked(
+                    genHalfCircle(x, y, radius, false, false, class),
+                    genLine(
+                        x - radius - rrr,
+                        y - rr + rrr,
+                        x - radius + rrr,
+                        y - rr - rrr,
+                        class
+                    ),
+                    genLine(
+                        x + radius - rrr,
+                        y - rr - rrr,
+                        x + radius + rrr,
+                        y - rr + rrr,
+                        class
+                    )
+                );
+        } else if (mouthType == 12) {
+            uint256 hh = 8;
+            uint256 ww = w / uint256(2);
+            return
+                abi.encodePacked(
+                    genLine(x - ww, y - hh, x + ww, y - hh, class),
+                    genLine(x - ww, y, x + ww, y, class),
+                    genLine(x - ww, y + hh, x + ww, y + hh, class)
+                );
+        } else {
+            // mouthType == 13
+            uint256 hh = 8;
+            uint256 w1 = w / uint256(2);
+            uint256 w2 = w * uint(618) / uint(2000);
+            uint256 w3 = w * uint(190962) / uint(1000000);
+            return
+                abi.encodePacked(
+                    genLine(x - w1, y - hh, x + w1, y - hh, class),
+                    genLine(x - w2, y, x + w2, y, class),
+                    genLine(x - w3, y + hh, x + w3, y + hh, class)
+                );
+        }
+    }
+
+    ////// generate common object //////
 
     /// generate circle with center (cx, cy) and radius and the svg class.
     function genCircle(
@@ -908,6 +926,30 @@ contract YourCollectible is ERC721Enumerable, Ownable {
                 " ",
                 yString,
                 closed ? ' Z"/>' : '"/>'
+            );
+    }
+
+    /// generate ellipse with center (cx, cy), radius x, radius y and the svg class.
+    function genEllipse(
+        uint256 cx,
+        uint256 cy,
+        uint256 radiusX,
+        uint256 radiusY,
+        string memory class
+    ) private pure returns (bytes memory) {
+        return
+            abi.encodePacked(
+                '<ellipse class="',
+                class,
+                '" cx="',
+                cx.toString(),
+                '" cy="',
+                cy.toString(),
+                '" rx="',
+                radiusX.toString(),
+                '" ry="',
+                radiusY.toString(),
+                '"/>'
             );
     }
 }
