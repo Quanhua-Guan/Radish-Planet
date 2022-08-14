@@ -369,7 +369,8 @@ contract YourCollectible is ERC721Enumerable, Ownable {
         uint256 _shape = shape[id];
         bool hasSameEyes = (uint256(uint8(_shape >> 32)) % uint256(1000)) ==
             uint256(0);
-        uint256 eyeType = uint256(uint8(_shape >> 40)) % uint256(36);
+        uint256 totalEyeType = 44;
+        uint256 eyeType = uint256(uint8(_shape >> 40)) % totalEyeType;
 
         uint256 lx = 150;
         uint256 rx = 250;
@@ -387,7 +388,8 @@ contract YourCollectible is ERC721Enumerable, Ownable {
                     eye(eyeType, eyeSize, rx, y, false)
                 );
         } else {
-            uint256 eyeTypeAnother = uint256(uint8(_shape >> 64)) % uint256(36);
+            uint256 eyeTypeAnother = uint256(uint8(_shape >> 64)) %
+                totalEyeType;
             return
                 abi.encodePacked(
                     eye(eyeType, eyeSize, lx, y, true),
@@ -403,6 +405,7 @@ contract YourCollectible is ERC721Enumerable, Ownable {
         uint256 y,
         bool isLeft
     ) private pure returns (bytes memory) {
+        eyeType = uint256(41) + (eyeType % uint256(3));
         bytes memory emptyStringBytes = abi.encodePacked("");
         string memory eyeClass = isLeft ? "eye_l" : "eye_r";
         uint256 r = eyeSize / uint256(2);
@@ -607,8 +610,7 @@ contract YourCollectible is ERC721Enumerable, Ownable {
                 );
         } else if (eyeType == 39) {
             return genCircle(x, y, 3, eyeClass);
-        } else {
-            // eyeType == 40
+        } else if (eyeType == 40) {
             uint256 rr = r / uint256(2);
             return
                 abi.encodePacked(
@@ -616,6 +618,11 @@ contract YourCollectible is ERC721Enumerable, Ownable {
                     genLine(x - rr, y - rr, x - rr, y + rr, eyeClass),
                     genLine(x + rr, y - rr, x + rr, y + rr, eyeClass)
                 );
+        } else if (eyeType == 41 || eyeType == 42) {
+            return genHalfCircle(x, y, r, false, eyeType == 42, eyeClass);
+        } else {
+            // eyeType == 43
+            return genHalfCircle(x, y, r, true, true, eyeClass);
         }
     }
 
@@ -882,6 +889,8 @@ contract YourCollectible is ERC721Enumerable, Ownable {
         string memory class
     ) private pure returns (bytes memory) {
         string memory radiusString = radius.toString();
+        uint256 rr = radius / uint256(2);
+        string memory yString = (isTop ? (cy + rr) : (cy - rr)).toString();
         return
             abi.encodePacked(
                 '<path class="',
@@ -889,7 +898,7 @@ contract YourCollectible is ERC721Enumerable, Ownable {
                 '" d="M ',
                 (cx - radius).toString(),
                 ",",
-                cy.toString(),
+                yString,
                 " A ",
                 radiusString,
                 " ",
@@ -897,7 +906,7 @@ contract YourCollectible is ERC721Enumerable, Ownable {
                 isTop ? " 0 0 1 " : " 0 0 0 ",
                 (cx + radius).toString(),
                 " ",
-                cy.toString(),
+                yString,
                 closed ? ' Z"/>' : '"/>'
             );
     }
