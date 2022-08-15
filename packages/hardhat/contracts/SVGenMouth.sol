@@ -24,8 +24,9 @@ library SVGenMouth {
         if (mouthType == 0) {
             return SVGen.genCircle(x, y, radius, class);
         } else if (mouthType == 1) {
-            uint256 cornerRadius = ((radius / uint256(2)) *
-                uint256(uint8(_shape >> 104))) / uint256(255);
+            uint256 cornerRadius = uint256(5) +
+                ((radius / uint256(2)) * uint256(uint8(_shape >> 104))) /
+                uint256(255);
             return SVGen.genRect(x, y, w, h, cornerRadius, cornerRadius, class);
         } else if (mouthType == 2) {
             return SVGen.genDownTriangle(x, y, radius, class);

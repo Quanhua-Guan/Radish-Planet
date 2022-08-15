@@ -23,12 +23,11 @@ contract YourCollectible is ERC721Enumerable, Ownable {
     constructor() ERC721("Radish Planet", "RDH") {}
 
     mapping(uint256 => uint256) public birth;
-    mapping(uint256 => uint256) public shape;
-
-    uint256 mintDeadline = block.timestamp + 3650 days;
+    mapping(uint256 => uint256) public genes;
 
     function mintItem() public returns (uint256) {
-        require(block.timestamp < mintDeadline, "DONE MINTING");
+        // At most 99999 Radish NFTs
+        require(_tokenIds.current() <= 99999, "DONE");
         _tokenIds.increment();
 
         uint256 id = _tokenIds.current();
@@ -44,34 +43,31 @@ contract YourCollectible is ERC721Enumerable, Ownable {
             )
         );
 
-        shape[id] = uint256(predictableRandom);
+        genes[id] = uint256(predictableRandom);
         birth[id] = block.timestamp;
 
         return id;
     }
 
     function tokenURI(uint256 id) public view override returns (string memory) {
-        require(_exists(id), "!exist");
+        require(_exists(id), "!EXIST");
 
-        string memory name = string(
-            abi.encodePacked("Radish #", id.toString())
+        bytes memory name = abi.encodePacked("Radish #", id.toString());
+        bytes memory description = abi.encodePacked(
+            "I am Radish #",
+            id.toString(),
+            ", all is well!"
         );
-        string memory description = string(
-            abi.encodePacked(
-                "This Radish borns with svgen.genes of color #",
-                "!!!"
-            )
-        );
-        uint256 _shape = shape[id];
+        uint256 gene = genes[id];
         string memory image = Base64.encode(
             abi.encodePacked(
                 '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" version="1.1">',
-                SVGenStyle.style(_shape),
-                '<rect class="background" x="1" y="1" rx="2" ry="2" width="398" height="398" />',
-                SVGenLeaf.leafs(_shape),
-                SVGenBody.body(_shape),
-                SVGenEye.eyes(_shape),
-                SVGenMouth.mouth(_shape),
+                SVGenStyle.style(gene),
+                '<rect class="background" x="1" y="1" rx="3" ry="3" width="398" height="398" />',
+                SVGenLeaf.leafs(gene),
+                SVGenBody.body(gene),
+                SVGenEye.eyes(gene),
+                SVGenMouth.mouth(gene),
                 "</svg>"
             )
         );
@@ -86,8 +82,6 @@ contract YourCollectible is ERC721Enumerable, Ownable {
                                 name,
                                 '","description":"',
                                 description,
-                                '","external_url":"https://radishplanet.com/token/',
-                                id.toString(),
                                 '","attributes":[{"trait_type":"left ear color","value":"#',
                                 '"}],"owner":"',
                                 (uint160(ownerOf(id))).toHexString(20),

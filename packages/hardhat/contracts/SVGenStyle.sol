@@ -33,7 +33,7 @@ library SVGenStyle {
                 ".mouth{fill:#e8d0d4;stroke:white;stroke-width:3}",
                 ".mouth_opacity{fill:#e8d0d4;stroke:white;stroke-width:3;fill-opacity:0.3}",
                 // branch
-                ".branch{fill:#e8d0d4;stroke:white;stroke-width:4}",
+                ".branch{fill:#e8d0d4;stroke:white;stroke-width:4;fill-opacity:0.5}",
                 // leaf
                 ".leaf{fill:#efbbb6; stroke:white; stroke-width:5}",
                 // bottom

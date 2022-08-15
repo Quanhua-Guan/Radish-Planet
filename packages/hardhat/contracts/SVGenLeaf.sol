@@ -97,8 +97,8 @@ library SVGenLeaf {
                             abi.encodePacked(
                                 leaf(leafType1, 50, 50, leafSize, class),
                                 leaf(leafType2, 150, 50, leafSize, class),
-                                leaf(leafType3, 250, 50, leafSize, class),
-                                leaf(leafType4, 350, 50, leafSize, class),
+                                leaf(leafType3, 200, 50, leafSize, class),
+                                leaf(leafType4, 250, 50, leafSize, class),
                                 leaf(leafType5, 350, 50, leafSize, class)
                             );
                     }
