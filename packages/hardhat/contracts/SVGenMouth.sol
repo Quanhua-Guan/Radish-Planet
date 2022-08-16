@@ -9,7 +9,7 @@ library SVGenMouth {
 
     // create mouth
     function mouth(uint256 _shape) public pure returns (bytes memory) {
-        uint256 mouthType = uint256(uint8(_shape >> 72)) % 14;
+        uint256 mouthType = uint256(uint8(_shape >> 72)) % uint256(14);
         uint256 x = 200;
         uint256 y = 250 +
             ((uint256(30) * uint256(uint8(_shape >> 80))) / uint256(255));

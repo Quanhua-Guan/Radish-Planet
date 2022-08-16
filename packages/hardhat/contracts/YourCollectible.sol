@@ -71,6 +71,21 @@ contract YourCollectible is ERC721Enumerable, Ownable {
                 "</svg>"
             )
         );
+
+        uint256 body = uint256(gene) % uint256(5);
+        bool differentEyes = (uint256(uint8(gene >> 32)) % uint256(1000)) ==
+            uint256(0);
+        uint256 leftEye = uint256(uint8(gene >> 40)) % uint256(44);
+        uint256 rightEye = differentEyes
+            ? uint256(uint8(gene >> 64)) % uint256(44)
+            : leftEye;
+        uint256 mouth = uint256(uint8(gene >> 72)) % uint256(14);
+        uint256 leafsCount = uint256(1) +
+            (uint256(uint8(gene >> 104)) % uint256(5));
+        bool hasColorChangingLeaf = uint256(uint8(gene >> 124)) %
+            uint256(1000) ==
+            0;
+
         return
             string(
                 abi.encodePacked(
@@ -82,8 +97,23 @@ contract YourCollectible is ERC721Enumerable, Ownable {
                                 name,
                                 '","description":"',
                                 description,
-                                '","attributes":[{"trait_type":"left ear color","value":"#',
-                                '"}],"owner":"',
+                                '","attributes":[{"trait_type":"body","value":"B-',
+                                body.toString(),
+                                '"},{"trait_type":"left eye","value":"E-',
+                                leftEye.toString(),
+                                '"},{"trait_type":"right eye","value":"E-',
+                                rightEye.toString(),
+                                '"},{"trait_type":"different eyes","value":"',
+                                differentEyes ? "YES(1/1000)" : "NO",
+                                '"},{"trait_type":"mouth","value":"M-',
+                                mouth.toString(),
+                                '"},{"trait_type":"leafs","value":"',
+                                leafsCount.toString(),
+                                '"},{"trait_type":"color-changing leaf","value":"',
+                                hasColorChangingLeaf
+                                    ? "HAS(1/1000)"
+                                    : "NONE"
+                                    '"}],"owner":"',
                                 (uint160(ownerOf(id))).toHexString(20),
                                 '","image": "',
                                 "data:image/svg+xml;base64,",

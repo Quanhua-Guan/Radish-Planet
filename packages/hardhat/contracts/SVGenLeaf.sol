@@ -61,8 +61,9 @@ library SVGenLeaf {
         uint256 leafType1 = uint256(uint8(_shape >> 120)) % uint256(5);
 
         string memory class = "leaf";
+        // 1 / 1000 HAS COLOR-CHANGING LEAF
         string memory classVar = uint256(uint8(_shape >> 124)) %
-            uint256(2) ==
+            uint256(1000) ==
             0
             ? "leaf_var"
             : class;
