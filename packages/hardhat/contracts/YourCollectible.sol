@@ -24,12 +24,13 @@ contract YourCollectible is ERC721Enumerable, Ownable {
 
     mapping(uint256 => uint256) public birth;
     mapping(uint256 => uint256) public genes;
-    uint256 limit = 99999;
+    uint256 public limit = 99999;
+    uint256 public price = 0.001 ether;
 
     function mintItem() public payable returns (uint256) {
         // At most 99999 Radish NFTs
         require(_tokenIds.current() <= limit, "LIMIT");
-        require(msg.value >= 0.001 ether, "0.001 Ether");
+        require(msg.value >= price, "0.001 Ether");
 
         _tokenIds.increment();
 
@@ -58,6 +59,10 @@ contract YourCollectible is ERC721Enumerable, Ownable {
     function updateLimit(uint256 _limit) public onlyOwner {
         require(_limit > limit, "!IL");
         limit = _limit;
+    }
+
+    function updatePrice(uint256 _price) public onlyOwner {
+        price = _price;
     }
 
     function tokenURI(uint256 id) public view override returns (string memory) {
