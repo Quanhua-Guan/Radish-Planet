@@ -3,6 +3,8 @@ import React, { useState, useEffect } from "react";
 import { Address, AddressInput } from "../components";
 import { useContractReader } from "eth-hooks";
 
+const { ethers } = require("ethers");
+
 /**
  * web3 props can be passed from '../App.jsx' into your local view component for use
  * @param {*} yourLocalBalance balance on current network
@@ -26,18 +28,28 @@ function Home({
   const balanceContract = useContractReader(readContracts, "YourCollectible", "balanceOf", [address]);
   const [balance, setBalance] = useState();
 
+  const priceContract = useContractReader(readContracts, "YourCollectible", "price");
+  const [price, setPrice] = useState();
+
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
     if (balanceContract) {
       setBalance(balanceContract);
     }
   }, [balanceContract]);
 
-  const [yourCollectibles, setYourCollectibles] = useState();
+  useEffect(() => {
+    if (priceContract) {
+      setPrice(priceContract);
+    }
+  }, [priceContract]);
 
-  console.log("Home: " + address + ", Balance: " + balance);
+  const [yourCollectibles, setYourCollectibles] = useState();
 
   useEffect(() => {
     const updateYourCollectibles = async () => {
+      setLoading(true);
       const collectibleUpdate = [];
       for (let tokenIndex = 0; tokenIndex < balance; ++tokenIndex) {
         try {
@@ -60,6 +72,7 @@ function Home({
         }
       }
       setYourCollectibles(collectibleUpdate.reverse());
+      setLoading(false);
     }
     if (address && balance)
       updateYourCollectibles();
@@ -70,8 +83,10 @@ function Home({
       <div style={{ maxWidth: 820, margin: "auto", marginTop: 32, paddingBottom: 32 }}>
         {userSigner ? (
           <Button type={"primary"} onClick={() => {
-            tx(writeContracts.YourCollectible.mintItem())
-          }}>MINT</Button>
+            if (price == undefined) return;
+
+            tx(writeContracts.YourCollectible.mintItem({ value: price }))
+          }}>MINT WITH {price ? ethers.utils.formatEther(price) : 0.001} ETH</Button>
         ) : (
           <Button type={"primary"} onClick={loadWeb3Modal}>CONNECT WALLET</Button>
         )}
