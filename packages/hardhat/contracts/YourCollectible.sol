@@ -62,7 +62,7 @@ contract YourCollectible is ERC721Enumerable, Ownable {
         string memory image = Base64.encode(
             abi.encodePacked(
                 '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" version="1.1">',
-                SVGenStyle.style(gene),
+                SVGenStyle.style(gene, block.timestamp - birth[id]),
                 '<rect class="background" x="1" y="1" rx="3" ry="3" width="398" height="398" />',
                 SVGenLeaf.leafs(gene),
                 SVGenBody.body(gene),

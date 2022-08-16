@@ -59,7 +59,13 @@ library SVGenLeaf {
             ((uint256(20) * uint256(uint8(_shape >> 112))) / uint256(255));
 
         uint256 leafType1 = uint256(uint8(_shape >> 120)) % uint256(5);
+
         string memory class = "leaf";
+        string memory classVar = uint256(uint8(_shape >> 124)) %
+            uint256(2) ==
+            0
+            ? "leaf_var"
+            : class;
         if (leafCount == 1) {
             return leaf(leafType1, 200, 50, leafSize, class);
         } else {
@@ -68,7 +74,7 @@ library SVGenLeaf {
                 return
                     abi.encodePacked(
                         leaf(leafType1, 150, 50, leafSize, class),
-                        leaf(leafType2, 250, 50, leafSize, class)
+                        leaf(leafType2, 250, 50, leafSize, classVar)
                     );
             } else {
                 uint256 leafType3 = uint256(uint8(_shape >> 136)) % uint256(5);
@@ -77,7 +83,7 @@ library SVGenLeaf {
                         abi.encodePacked(
                             leaf(leafType1, 100, 50, leafSize, class),
                             leaf(leafType2, 200, 50, leafSize, class),
-                            leaf(leafType3, 300, 50, leafSize, class)
+                            leaf(leafType3, 300, 50, leafSize, classVar)
                         );
                 } else {
                     uint256 leafType4 = uint256(uint8(_shape >> 144)) %
@@ -88,7 +94,7 @@ library SVGenLeaf {
                                 leaf(leafType1, 50, 50, leafSize, class),
                                 leaf(leafType2, 150, 50, leafSize, class),
                                 leaf(leafType3, 250, 50, leafSize, class),
-                                leaf(leafType4, 350, 50, leafSize, class)
+                                leaf(leafType4, 350, 50, leafSize, classVar)
                             );
                     } else {
                         uint256 leafType5 = uint256(uint8(_shape >> 152)) %
@@ -99,7 +105,7 @@ library SVGenLeaf {
                                 leaf(leafType2, 150, 50, leafSize, class),
                                 leaf(leafType3, 200, 50, leafSize, class),
                                 leaf(leafType4, 250, 50, leafSize, class),
-                                leaf(leafType5, 350, 50, leafSize, class)
+                                leaf(leafType5, 350, 50, leafSize, classVar)
                             );
                     }
                 }
