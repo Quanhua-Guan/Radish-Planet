@@ -27,7 +27,7 @@ const { isAddress, getAddress, formatUnits, parseUnits } = utils;
 //
 // Select the network you want to deploy to here:
 //
-const defaultNetwork = "optimism";
+const defaultNetwork = "goerliOptimism";
 
 const mainnetGwei = 21;
 
@@ -154,12 +154,22 @@ module.exports = {
       },
     },
     optimism: {
-      url: "https://mainnet.optimism.io",
+      url: "https://opt-mainnet.g.alchemy.com/v2/IZyoT5KY066F7DbdDA4VyTehmuHvDXt-",
       accounts: {
         mnemonic: mnemonic(),
       },
       companionNetworks: {
         l1: "mainnet",
+      },
+    },
+    goerliOptimism: {
+      name: "goerliOptimism",          
+      url: `https://opt-goerli.g.alchemy.com/v2/yMVfYxcq_imoaYQ9qsZPwbitXMv9VuIj`,
+      companionNetworks: {
+        l1: "goerli",
+      },
+      accounts: {
+        mnemonic: mnemonic(),
       },
     },
     kovanOptimism: {

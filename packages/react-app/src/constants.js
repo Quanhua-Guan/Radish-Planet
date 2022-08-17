@@ -7,7 +7,7 @@ export const ETHERSCAN_KEY = "DNXJA8RX2Q3VZ4URQIWP7Z68CJXQZSC6AW";
 // BLOCKNATIVE ID FOR Notify.js:
 export const BLOCKNATIVE_DAPPID = "0b58206a-f3c0-4701-a62f-73c7243e8c77";
 
-export const ALCHEMY_KEY = "oKxs-03sij-U_N0iOlrSsZFr29-IqbuF";
+export const ALCHEMY_KEY = "yMVfYxcq_imoaYQ9qsZPwbitXMv9VuIj";
 
 const localRpcUrl = process.env.REACT_APP_CODESPACES
   ? `https://${window.location.hostname.replace("3000", "8545")}`
@@ -112,12 +112,22 @@ export const NETWORKS = {
     rpcUrl: `https://kovan.optimism.io`,
     gasPrice: 0,
   },
+  goerliOptimism: {
+    name: "goerliOptimism",
+    color: "#f01a37",
+    chainId: 420,
+    blockExplorer: "https://blockscout.com/optimism/goerli",
+    // https://goerli.optimism.io
+    rpcUrl: `https://opt-goerli.g.alchemy.com/v2/${ALCHEMY_KEY}`,
+    gasPrice: 0,
+  },
   optimism: {
     name: "optimism",
     color: "#f01a37",
     chainId: 10,
     blockExplorer: "https://optimistic.etherscan.io/",
-    rpcUrl: `https://mainnet.optimism.io`,
+    // rpcUrl: `https://mainnet.optimism.io`,
+    rpcUrl: `https://opt-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}`,
   },
   rinkebyArbitrum: {
     name: "rinkebyArbitrum",
