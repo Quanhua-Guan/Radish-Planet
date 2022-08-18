@@ -1,4 +1,4 @@
-import { Button, List, Card } from "antd";
+import { Button, List, Card, Spin } from "antd";
 import React, { useState, useEffect } from "react";
 import { Address, AddressInput } from "../components";
 import { useContractReader } from "eth-hooks";
@@ -27,6 +27,7 @@ function Home({
   // 🧠 This effect will update yourCollectibles by polling when your balance changes
   const balanceContract = useContractReader(readContracts, "YourCollectible", "balanceOf", [address]);
   const [balance, setBalance] = useState();
+  const [oldBalance, setOldBalance] = useState();
 
   const priceContract = useContractReader(readContracts, "YourCollectible", "price");
   const [price, setPrice] = useState();
@@ -74,9 +75,11 @@ function Home({
       setYourCollectibles(collectibleUpdate.reverse());
       setLoading(false);
     }
-    if (address && balance)
+    if (address && balance && (oldBalance == undefined || !balance.eq(oldBalance))) {
+      setOldBalance(balance);
       updateYourCollectibles();
-  }, [address, balance]);
+    }
+  }, [address, balance, setOldBalance, oldBalance]);
 
   return (
     <div>
@@ -93,60 +96,61 @@ function Home({
       </div>
 
       <div style={{ width: 820, margin: "auto", paddingBottom: 256 }}>
-        <List
-          bordered
-          dataSource={yourCollectibles}
-          renderItem={item => {
-            const id = item.id.toNumber();
+        {loading ? <Spin /> :
+          <List
+            bordered
+            dataSource={yourCollectibles}
+            renderItem={item => {
+              const id = item.id.toNumber();
 
-            console.log("IMAGE", item.image)
+              console.log("IMAGE", item.image)
 
-            return (
-              <List.Item key={id + "_" + item.uri + "_" + item.owner}>
-                <Card
-                  title={
-                    <div>
-                      <span style={{ fontSize: 18, marginRight: 8 }}>{item.name}</span>
-                    </div>
-                  }
-                >
-                  <a href={"https://opensea.io/assets/" + (readContracts && readContracts.YourCollectible && readContracts.YourCollectible.address) + "/" + item.id} target="_blank">
-                    <img src={item.image} />
-                  </a>
-                  <div>{item.description}</div>
-                </Card>
-
-                <div>
-                  owner:{" "}
-                  <Address
-                    address={item.owner}
-                    ensProvider={mainnetProvider}
-                    blockExplorer={blockExplorer}
-                    fontSize={16}
-                  />
-                  <AddressInput
-                    ensProvider={mainnetProvider}
-                    placeholder="transfer to address"
-                    value={transferToAddresses[id]}
-                    onChange={newValue => {
-                      const update = {};
-                      update[id] = newValue;
-                      setTransferToAddresses({ ...transferToAddresses, ...update });
-                    }}
-                  />
-                  <Button
-                    onClick={() => {
-                      console.log("writeContracts", writeContracts);
-                      tx(writeContracts.YourCollectible.transferFrom(address, transferToAddresses[id], id));
-                    }}
+              return (
+                <List.Item key={id + "_" + item.uri + "_" + item.owner}>
+                  <Card
+                    title={
+                      <div>
+                        <span style={{ fontSize: 18, marginRight: 8 }}>{item.name}</span>
+                      </div>
+                    }
                   >
-                    Transfer
-                  </Button>
-                </div>
-              </List.Item>
-            );
-          }}
-        />
+                    <a href={"https://opensea.io/assets/" + (readContracts && readContracts.YourCollectible && readContracts.YourCollectible.address) + "/" + item.id} target="_blank">
+                      <img src={item.image} />
+                    </a>
+                    <div>{item.description}</div>
+                  </Card>
+
+                  <div>
+                    owner:{" "}
+                    <Address
+                      address={item.owner}
+                      ensProvider={mainnetProvider}
+                      blockExplorer={blockExplorer}
+                      fontSize={16}
+                    />
+                    <AddressInput
+                      ensProvider={mainnetProvider}
+                      placeholder="transfer to address"
+                      value={transferToAddresses[id]}
+                      onChange={newValue => {
+                        const update = {};
+                        update[id] = newValue;
+                        setTransferToAddresses({ ...transferToAddresses, ...update });
+                      }}
+                    />
+                    <Button
+                      onClick={() => {
+                        console.log("writeContracts", writeContracts);
+                        tx(writeContracts.YourCollectible.transferFrom(address, transferToAddresses[id], id));
+                      }}
+                    >
+                      Transfer
+                    </Button>
+                  </div>
+                </List.Item>
+              );
+            }}
+          />}
       </div>
     </div>
   );
