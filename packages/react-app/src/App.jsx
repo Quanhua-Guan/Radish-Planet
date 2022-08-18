@@ -1,4 +1,4 @@
-import { Button, Col, Menu, Row } from "antd";
+import { Button, Col, Divider, Menu, Row } from "antd";
 import "antd/dist/antd.css";
 import {
   useBalance,
@@ -241,7 +241,7 @@ function App(props) {
       />
       <Menu style={{ textAlign: "center", marginTop: 20 }} selectedKeys={[location.pathname]} mode="horizontal">
         <Menu.Item key="/">
-          <Link to="/">Radish Planet</Link>
+          <Link to="/">Your Radish NFTs</Link>
         </Menu.Item>
         <Menu.Item key="/debug">
           <Link to="/debug">Smart Contracts</Link>

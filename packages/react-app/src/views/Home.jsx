@@ -1,9 +1,11 @@
-import { Button, List, Card, Spin } from "antd";
+import { Button, List, Card, Spin, Divider } from "antd";
 import React, { useState, useEffect } from "react";
 import { Address, AddressInput } from "../components";
 import { useContractReader } from "eth-hooks";
 
 const { ethers } = require("ethers");
+
+const DEBUG = true;
 
 /**
  * web3 props can be passed from '../App.jsx' into your local view component for use
@@ -34,17 +36,37 @@ function Home({
 
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (balanceContract) {
-      setBalance(balanceContract);
-    }
-  }, [balanceContract]);
+  const limitContract = useContractReader(readContracts, "YourCollectible", "limit");
+  const [limit, setLimit] = useState();
+
+  const totalSupplyContract = useContractReader(readContracts, "YourCollectible", "totalSupply");
+  const [totalSupply, setTotalSupply] = useState();
 
   useEffect(() => {
-    if (priceContract) {
-      setPrice(priceContract);
+    if (balanceContract && (balance === undefined || !balanceContract.eq(balance))) {
+      setBalance(balanceContract);
     }
-  }, [priceContract]);
+  }, [balanceContract, balance]);
+
+  useEffect(() => {
+    if (priceContract && (price === undefined || !priceContract.eq(price))) {
+      setPrice(priceContract);
+      if (DEBUG) console.log("xxx: set price, ", price, priceContract);
+    }
+    if (DEBUG) console.log("xxx: price, ", price, priceContract);
+  }, [priceContract, price]);
+
+  useEffect(() => {
+    if (limitContract && (limit == undefined || !limitContract.eq(limit))) {
+      setLimit(limitContract);
+    }
+  }, [limitContract]);
+
+  useEffect(() => {
+    if (totalSupplyContract && (totalSupply == undefined || !totalSupplyContract.eq(totalSupply))) {
+      setTotalSupply(totalSupplyContract);
+    }
+  }, [totalSupplyContract]);
 
   const [yourCollectibles, setYourCollectibles] = useState();
 
@@ -54,16 +76,16 @@ function Home({
       const collectibleUpdate = [];
       for (let tokenIndex = 0; tokenIndex < balance; ++tokenIndex) {
         try {
-          console.log("Getting token index " + tokenIndex);
+          if (DEBUG) console.log("Getting token index " + tokenIndex);
           const tokenId = await readContracts.YourCollectible.tokenOfOwnerByIndex(address, tokenIndex);
-          console.log("tokenId: " + tokenId);
+          if (DEBUG) console.log("tokenId: " + tokenId);
           const tokenURI = await readContracts.YourCollectible.tokenURI(tokenId);
           const jsonManifestString = Buffer.from(tokenURI.substring(29), "base64").toString();
-          console.log("jsonManifestString: " + jsonManifestString);
+          if (DEBUG) console.log("jsonManifestString: " + jsonManifestString);
 
           try {
             const jsonManifest = JSON.parse(jsonManifestString);
-            console.log("jsonManifest: " + jsonManifest);
+            if (DEBUG) console.log("jsonManifest: " + jsonManifest);
             collectibleUpdate.push({ id: tokenId, uri: tokenURI, owner: address, ...jsonManifest });
           } catch (err) {
             console.log(err);
@@ -83,17 +105,50 @@ function Home({
 
   return (
     <div>
-      <div style={{ maxWidth: 820, margin: "auto", marginTop: 32, paddingBottom: 32 }}>
+      <div style={{ maxWidth: 820, margin: "auto", marginTop: 32 }}>
+        <div style={{ fontSize: 16 }}>
+          <p><strong>RADISH NFTs WILL EXIST FOREVER! THEIR SOULS ARE STORED INSIDE THE BLOCKCHAIN!</strong></p>
+          <Divider />
+          <p>Half Ether from sales goes to <strong><a href="https://optimistic.etherscan.io/address/0xa81a6a910FeD20374361B35C451a4a44F86CeD46" target="_blank">buidlguidl.eth</a></strong>, another half goes to the author.</p>
+        </div>
+      </div>
+      <div style={{ maxWidth: 820, height: 50, margin: "auto" }}>
+        {
+          (totalSupply && limit) ?
+            (<p style={{ fontWeight: "bold" }}>
+              🎉 {totalSupply.toString()} OF {limit.toString()} MINTED 🎉
+            </p>) : (<div />)
+        }
+      </div>
+      <div style={{ maxWidth: 820, margin: "auto", marginTop: 0, paddingBottom: 0 }}>
         {userSigner ? (
-          <Button type={"primary"} onClick={() => {
-            if (price == undefined) return;
+          <div>
+            <div style={{ maxWidth: 820, margin: "auto", marginTop: 0, paddingBottom: 10 }}>
+              <Button type={"primary"} onClick={() => {
+                if (price === undefined) return;
 
-            tx(writeContracts.YourCollectible.mintItem({ value: price }))
-          }}>MINT WITH {price ? ethers.utils.formatEther(price) : 0.001} ETH</Button>
+                tx(writeContracts.YourCollectible.mintItem({ value: price }))
+              }}>MINT WITH {price ? ethers.utils.formatEther(price) : 0.001} ETH 🥳</Button>
+            </div>
+            <div style={{ maxWidth: 820, margin: "auto", marginTop: 0, paddingBottom: 10 }}>
+              <Button type={"primary"} onClick={() => {
+                if (price === undefined) return;
+                tx(writeContracts.YourCollectible.mintItem({ value: price.mult(2) }))
+              }}>MINT WITH {price ? ethers.utils.formatEther(price.mul(2)) : 0.002} ETH 🥰</Button>
+            </div>
+            <div style={{ maxWidth: 820, margin: "auto", marginTop: 0, paddingBottom: 10 }}>
+              <Button type={"primary"} onClick={() => {
+                if (price === undefined) return;
+
+                tx(writeContracts.YourCollectible.mintItem({ value: price.mul(5) }))
+              }}>MINT WITH {price ? ethers.utils.formatEther(price.mul(5)) : 0.005} ETH 🤩</Button>
+            </div>
+          </div>
         ) : (
           <Button type={"primary"} onClick={loadWeb3Modal}>CONNECT WALLET</Button>
         )}
       </div>
+      <Divider />
 
       <div style={{ width: 820, margin: "auto", paddingBottom: 256 }}>
         {loading ? <Spin /> :
@@ -152,7 +207,7 @@ function Home({
             }}
           />}
       </div>
-    </div>
+    </div >
   );
 }
 

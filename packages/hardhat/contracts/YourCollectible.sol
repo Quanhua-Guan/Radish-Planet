@@ -27,6 +27,9 @@ contract YourCollectible is ERC721Enumerable, Ownable {
     uint256 public limit = 99999;
     uint256 public price = 0.001 ether;
 
+    // half funds go to buidlguidl.eth
+    address payable public constant buidlguidl = payable(0xa81a6a910FeD20374361B35C451a4a44F86CeD46);
+
     function mintItem() public payable returns (uint256) {
         // At most 99999 Radish NFTs
         require(_tokenIds.current() <= limit, "LIMIT");
@@ -50,8 +53,15 @@ contract YourCollectible is ERC721Enumerable, Ownable {
         genes[id] = uint256(predictableRandom);
         birth[id] = block.timestamp;
 
-        (bool success, ) = payable(owner()).call{value: msg.value}("");
-        require(success, "!PAY");
+        // half to owner
+        (bool success0, ) = payable(owner()).call{value: (msg.value / 2)}("");
+        require(success0, "!PAY0");
+
+        // half to buidlguidl
+        (bool success1, ) = buidlguidl.call{
+            value: (msg.value - (msg.value / 2))
+        }("");
+        require(success1, "!PAY0");
 
         return id;
     }
