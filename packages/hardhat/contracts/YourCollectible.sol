@@ -28,7 +28,8 @@ contract YourCollectible is ERC721Enumerable, Ownable {
     uint256 public price = 0.001 ether;
 
     // half funds go to buidlguidl.eth
-    address payable public constant buidlguidl = payable(0xa81a6a910FeD20374361B35C451a4a44F86CeD46);
+    address payable public constant buidlguidl =
+        payable(0xa81a6a910FeD20374361B35C451a4a44F86CeD46);
 
     function mintItem() public payable returns (uint256) {
         // At most 99999 Radish NFTs
@@ -136,10 +137,8 @@ contract YourCollectible is ERC721Enumerable, Ownable {
                                 '"},{"trait_type":"leafs","value":"',
                                 leafsCount.toString(),
                                 '"},{"trait_type":"color-changing leaf","value":"',
-                                hasColorChangingLeaf
-                                    ? "HAS(1/1000)"
-                                    : "NONE"
-                                    '"}],"owner":"',
+                                hasColorChangingLeaf ? "HAS(1/1000)" : "NONE",
+                                '"}],"owner":"',
                                 (uint160(ownerOf(id))).toHexString(20),
                                 '","image": "',
                                 "data:image/svg+xml;base64,",

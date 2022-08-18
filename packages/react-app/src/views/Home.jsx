@@ -133,7 +133,7 @@ function Home({
             <div style={{ maxWidth: 820, margin: "auto", marginTop: 0, paddingBottom: 10 }}>
               <Button type={"primary"} onClick={() => {
                 if (price === undefined) return;
-                tx(writeContracts.YourCollectible.mintItem({ value: price.mult(2) }))
+                tx(writeContracts.YourCollectible.mintItem({ value: price.mul(2) }))
               }}>MINT WITH {price ? ethers.utils.formatEther(price.mul(2)) : 0.002} ETH 🥰</Button>
             </div>
             <div style={{ maxWidth: 820, margin: "auto", marginTop: 0, paddingBottom: 10 }}>
@@ -158,7 +158,7 @@ function Home({
             renderItem={item => {
               const id = item.id.toNumber();
 
-              console.log("IMAGE", item.image)
+              if (DEBUG) console.log("IMAGE", item.image)
 
               return (
                 <List.Item key={id + "_" + item.uri + "_" + item.owner}>
