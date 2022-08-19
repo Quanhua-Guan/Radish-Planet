@@ -27,7 +27,7 @@ const { isAddress, getAddress, formatUnits, parseUnits } = utils;
 //
 // Select the network you want to deploy to here:
 //
-const defaultNetwork = "optimism";
+const defaultNetwork = "goerli";
 
 const mainnetGwei = 21;
 
