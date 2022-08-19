@@ -5,7 +5,7 @@ import { useContractReader } from "eth-hooks";
 
 const { ethers } = require("ethers");
 
-const DEBUG = true;
+const DEBUG = false;
 
 /**
  * web3 props can be passed from '../App.jsx' into your local view component for use
@@ -169,9 +169,9 @@ function Home({
                       </div>
                     }
                   >
-                    <a href={"https://opensea.io/assets/" + (readContracts && readContracts.YourCollectible && readContracts.YourCollectible.address) + "/" + item.id} target="_blank">
-                      <img src={item.image} />
-                    </a>
+                    {/* <a href={"https://opensea.io/assets/" + (readContracts && readContracts.YourCollectible && readContracts.YourCollectible.address) + "/" + item.id} target="_blank"> */}
+                    <img src={item.image} />
+                    {/* </a> */}
                     <div>{item.description}</div>
                   </Card>
 
@@ -195,7 +195,7 @@ function Home({
                     />
                     <Button
                       onClick={() => {
-                        console.log("writeContracts", writeContracts);
+                        if (DEBUG) console.log("writeContracts", writeContracts);
                         tx(writeContracts.YourCollectible.transferFrom(address, transferToAddresses[id], id));
                       }}
                     >

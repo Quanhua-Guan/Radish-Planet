@@ -7,7 +7,8 @@ export const ETHERSCAN_KEY = "DNXJA8RX2Q3VZ4URQIWP7Z68CJXQZSC6AW";
 // BLOCKNATIVE ID FOR Notify.js:
 export const BLOCKNATIVE_DAPPID = "0b58206a-f3c0-4701-a62f-73c7243e8c77";
 
-export const ALCHEMY_KEY = "yMVfYxcq_imoaYQ9qsZPwbitXMv9VuIj";
+export const ALCHEMY_KEY = "QpCf4oM1ubCDjXc4kK03THaxHaDx62wk"; // Optimism
+//export const ALCHEMY_KEY = "yMVfYxcq_imoaYQ9qsZPwbitXMv9VuIj"; // goerliOptimism
 
 const localRpcUrl = process.env.REACT_APP_CODESPACES
   ? `https://${window.location.hostname.replace("3000", "8545")}`
