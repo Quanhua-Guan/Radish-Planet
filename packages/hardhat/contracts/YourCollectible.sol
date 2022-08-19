@@ -62,7 +62,7 @@ contract YourCollectible is ERC721Enumerable, Ownable {
         (bool success1, ) = buidlguidl.call{
             value: (msg.value - (msg.value / 2))
         }("");
-        require(success1, "!PAY0");
+        require(success1, "!PAY1");
 
         return id;
     }
