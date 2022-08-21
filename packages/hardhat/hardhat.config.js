@@ -14,6 +14,10 @@ require("@nomiclabs/hardhat-ethers");
 require("@nomiclabs/hardhat-etherscan");
 
 const { isAddress, getAddress, formatUnits, parseUnits } = utils;
+// export https_proxy=http://127.0.0.1:7890 http_proxy=http://127.0.0.1:7890 all_proxy=socks5://127.0.0.1:7890
+const { setGlobalDispatcher, ProxyAgent } = require('undici');
+const proxyAgent = new ProxyAgent("http://127.0.0.1:7890");
+setGlobalDispatcher(proxyAgent);
 
 /*
       📡 This is where you configure your deploy configuration for Radish Planet
@@ -333,6 +337,7 @@ module.exports = {
   etherscan: {
     apiKey: {
       mainnet: "PFCZTNTCSW72DNXHMBWRRCE9A7JRHT4PTU",
+      goerli: "PFCZTNTCSW72DNXHMBWRRCE9A7JRHT4PTU",
       // add other network's API key here
       optimisticEthereum: "X8D62JT97P6IF7XGXMW3FYZFQNQM7BP99N",
     },
