@@ -31,7 +31,7 @@ setGlobalDispatcher(proxyAgent);
 //
 // Select the network you want to deploy to here:
 //
-const defaultNetwork = "goerli";
+const defaultNetwork = "optimism";
 
 const mainnetGwei = 21;
 
